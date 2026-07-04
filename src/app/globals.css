@@ -1,0 +1,31 @@
+@import "tailwindcss";
+
+:root {
+  --background: var(--paper);
+  --foreground: var(--ink);
+
+  /* Couply design tokens — placeholder values, chỉnh lại theo mockup đã chốt */
+  --a: #c1633b; /* terracotta */
+  --b: #5f8575; /* sage teal */
+  --gold: #c9a227;
+  --ink: #211f1c;
+  --paper: #faf6ef;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-a: var(--a);
+  --color-b: var(--b);
+  --color-gold: var(--gold);
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
