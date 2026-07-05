@@ -18,19 +18,16 @@ export default async function NotificationsPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("currency")
-    .eq("id", user!.id)
-    .single();
+  const [{ data: profile }, { data: notifications }] = await Promise.all([
+    supabase.from("profiles").select("currency").eq("id", user!.id).single(),
+    supabase
+      .from("notifications")
+      .select("id, payload, is_read, created_at")
+      .eq("user_id", user!.id)
+      .order("created_at", { ascending: false })
+      .limit(50),
+  ]);
   const currency = profile?.currency ?? "VND";
-
-  const { data: notifications } = await supabase
-    .from("notifications")
-    .select("id, payload, is_read, created_at")
-    .eq("user_id", user!.id)
-    .order("created_at", { ascending: false })
-    .limit(50);
 
   const unreadIds = (notifications ?? [])
     .filter((n) => !n.is_read)

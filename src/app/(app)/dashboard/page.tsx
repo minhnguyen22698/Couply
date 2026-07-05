@@ -18,36 +18,38 @@ export default async function DashboardPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("display_name, currency")
-    .eq("id", user!.id)
-    .single();
-
-  const currency = profile?.currency ?? "VND";
   const { start, end } = currentMonthRange();
 
-  const { data: monthExpenses } = await supabase
-    .from("expenses")
-    .select("amount")
-    .eq("user_id", user!.id)
-    .gte("spent_on", start)
-    .lt("spent_on", end);
+  const [{ data: profile }, { data: monthExpenses }, { data: recent }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("display_name, currency")
+        .eq("id", user!.id)
+        .single(),
+      supabase
+        .from("expenses")
+        .select("amount")
+        .eq("user_id", user!.id)
+        .gte("spent_on", start)
+        .lt("spent_on", end),
+      supabase
+        .from("expenses")
+        .select(
+          "id, amount, note, category_id, spent_on, receipt_path, visibility, categories(id, name, icon)",
+        )
+        .eq("user_id", user!.id)
+        .order("spent_on", { ascending: false })
+        .order("created_at", { ascending: false })
+        .limit(10),
+    ]);
+
+  const currency = profile?.currency ?? "VND";
 
   const total = (monthExpenses ?? []).reduce(
     (sum, row) => sum + Number(row.amount),
     0,
   );
-
-  const { data: recent } = await supabase
-    .from("expenses")
-    .select(
-      "id, amount, note, category_id, spent_on, receipt_path, visibility, categories(id, name, icon)",
-    )
-    .eq("user_id", user!.id)
-    .order("spent_on", { ascending: false })
-    .order("created_at", { ascending: false })
-    .limit(10);
 
   const items = (recent ?? []).map((row) =>
     normalizeExpenseRow(

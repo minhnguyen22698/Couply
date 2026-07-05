@@ -14,20 +14,7 @@ export default async function ExpensesPage({
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("currency")
-    .eq("id", user!.id)
-    .single();
-  const currency = profile?.currency ?? "VND";
-
-  const { data: categories } = await supabase
-    .from("categories")
-    .select("id, name, icon")
-    .eq("user_id", user!.id)
-    .order("sort_order", { ascending: true });
-
-  let query = supabase
+  let expensesQuery = supabase
     .from("expenses")
     .select(
       "id, amount, note, category_id, spent_on, receipt_path, visibility, categories(id, name, icon)",
@@ -36,11 +23,22 @@ export default async function ExpensesPage({
     .order("spent_on", { ascending: false })
     .order("created_at", { ascending: false });
 
-  if (categoryId) query = query.eq("category_id", categoryId);
-  if (from) query = query.gte("spent_on", from);
-  if (to) query = query.lte("spent_on", to);
+  if (categoryId) expensesQuery = expensesQuery.eq("category_id", categoryId);
+  if (from) expensesQuery = expensesQuery.gte("spent_on", from);
+  if (to) expensesQuery = expensesQuery.lte("spent_on", to);
 
-  const { data: expenses } = await query;
+  const [{ data: profile }, { data: categories }, { data: expenses }] =
+    await Promise.all([
+      supabase.from("profiles").select("currency").eq("id", user!.id).single(),
+      supabase
+        .from("categories")
+        .select("id, name, icon")
+        .eq("user_id", user!.id)
+        .order("sort_order", { ascending: true }),
+      expensesQuery,
+    ]);
+  const currency = profile?.currency ?? "VND";
+
   const items = (expenses ?? []).map((row) =>
     normalizeExpenseRow(
       row as unknown as Parameters<typeof normalizeExpenseRow>[0],

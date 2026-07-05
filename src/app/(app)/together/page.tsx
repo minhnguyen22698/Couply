@@ -19,20 +19,17 @@ export default async function TogetherPage() {
     data: { user },
   } = await supabase.auth.getUser();
 
-  const { data: profile } = await supabase
-    .from("profiles")
-    .select("currency")
-    .eq("id", user!.id)
-    .single();
+  const [{ data: profile }, { data: couple }] = await Promise.all([
+    supabase.from("profiles").select("currency").eq("id", user!.id).single(),
+    supabase
+      .from("couples")
+      .select("id, user_a_id, user_b_id, invite_code, status")
+      .or(`user_a_id.eq.${user!.id},user_b_id.eq.${user!.id}`)
+      .order("created_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
   const currency = profile?.currency ?? "VND";
-
-  const { data: couple } = await supabase
-    .from("couples")
-    .select("id, user_a_id, user_b_id, invite_code, status")
-    .or(`user_a_id.eq.${user!.id},user_b_id.eq.${user!.id}`)
-    .order("created_at", { ascending: false })
-    .limit(1)
-    .maybeSingle();
 
   if (!couple || couple.status !== "active") {
     const pendingCode =
@@ -53,26 +50,28 @@ export default async function TogetherPage() {
   const partnerId =
     couple.user_a_id === user!.id ? couple.user_b_id : couple.user_a_id;
 
-  const { data: partnerProfile } = await supabase
-    .from("profiles")
-    .select("display_name")
-    .eq("id", partnerId!)
-    .single();
-  const partnerName = partnerProfile?.display_name ?? "Partner";
-
   const { start, end } = currentMonthRange();
 
-  const { data: sharedExpenses } = await supabase
-    .from("expenses")
-    .select(
-      "id, user_id, amount, note, visibility, spent_on, categories(name, icon)",
-    )
-    .eq("couple_id", couple.id)
-    .neq("visibility", "private")
-    .gte("spent_on", start)
-    .lt("spent_on", end)
-    .order("spent_on", { ascending: false })
-    .order("created_at", { ascending: false });
+  const [{ data: partnerProfile }, { data: sharedExpenses }] =
+    await Promise.all([
+      supabase
+        .from("profiles")
+        .select("display_name")
+        .eq("id", partnerId!)
+        .single(),
+      supabase
+        .from("expenses")
+        .select(
+          "id, user_id, amount, note, visibility, spent_on, categories(name, icon)",
+        )
+        .eq("couple_id", couple.id)
+        .neq("visibility", "private")
+        .gte("spent_on", start)
+        .lt("spent_on", end)
+        .order("spent_on", { ascending: false })
+        .order("created_at", { ascending: false }),
+    ]);
+  const partnerName = partnerProfile?.display_name ?? "Partner";
 
   const items: SharedExpenseItem[] = (sharedExpenses ?? []).map((row) => {
     const category = row.categories as unknown as {

@@ -27,29 +27,46 @@ export function RealtimeNotifications({
 
   useEffect(() => {
     const supabase = createClient();
-    const channel = supabase
-      .channel(`notifications:${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notifications",
-          filter: `user_id=eq.${userId}`,
-        },
-        (payload) => {
-          const data = payload.new.payload as NotificationPayload;
-          setUnreadCount((count) => count + 1);
-          setToast(
-            `🔔 ${data.owner_name} vừa thêm ${VISIBILITY_LABEL[data.visibility] ?? "khoản chi chia sẻ"}`,
-          );
-          setTimeout(() => setToast(null), 4000);
-        },
-      )
-      .subscribe();
+    let cancelled = false;
+    let channel: ReturnType<typeof supabase.channel> | null = null;
+
+    // Realtime needs the JWT set on the socket *before* subscribing so RLS
+    // can match `user_id = auth.uid()` — subscribing immediately after
+    // client creation can race ahead of session hydration and silently
+    // deliver zero events.
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (cancelled) return;
+      if (session) supabase.realtime.setAuth(session.access_token);
+
+      channel = supabase
+        .channel(`notifications:${userId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notifications",
+            filter: `user_id=eq.${userId}`,
+          },
+          (payload) => {
+            const data = payload.new.payload as NotificationPayload;
+            setUnreadCount((count) => count + 1);
+            setToast(
+              `🔔 ${data.owner_name} vừa thêm ${VISIBILITY_LABEL[data.visibility] ?? "khoản chi chia sẻ"}`,
+            );
+            setTimeout(() => setToast(null), 4000);
+          },
+        )
+        .subscribe((status, err) => {
+          if (status === "CHANNEL_ERROR" || status === "TIMED_OUT") {
+            console.error("Realtime notifications subscription failed", err);
+          }
+        });
+    });
 
     return () => {
-      supabase.removeChannel(channel);
+      cancelled = true;
+      if (channel) supabase.removeChannel(channel);
     };
   }, [userId]);
 
