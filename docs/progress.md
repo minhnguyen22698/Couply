@@ -13,7 +13,7 @@
 | 4 — Ghép cặp & chia sẻ | **Hoàn tất** — Milestone 4 đạt (2026-07-05) |
 | 5 — Thông báo real-time | **Hoàn tất** — Milestone 5 đạt (2026-07-05) |
 | 6 — Ngày/Tháng/Năm + Quỹ chung + Ngân sách | **Hoàn tất** — Milestone 6 đạt (2026-07-05) |
-| 7 — Báo cáo & hoàn thiện | Chưa bắt đầu |
+| 7 — Báo cáo & hoàn thiện | Code xong (trừ Web Push + polish UI sâu) — chờ bạn test tay |
 
 ---
 
@@ -116,16 +116,28 @@
 
 **Milestone 6: ĐẠT (2026-07-05)**
 
-## GIAI ĐOẠN 7
+## GIAI ĐOẠN 7 — Báo cáo, biểu đồ & hoàn thiện
 
-Chưa bắt đầu (biểu đồ Recharts, PWA, polish UI, xuất CSV...). Xem chi tiết ở `implementation-plan-couply.md`.
+- [x] Cài `recharts`; áp dụng skill dataviz để chọn form/màu đúng trước khi code: breakdown theo danh mục là "so sánh độ lớn" → bar chart 1 màu (terracotta, `--a`) thay vì pie nhiều màu; so sánh 2 người là "phân biệt series" → grouped bar 2 màu cố định (`--a` = Bạn, `--b` = partner, đúng quy ước đã dùng từ Giai đoạn 4/6) kèm legend
+- [x] `CategoryBarChart` (`src/components/category-bar-chart.tsx`) trên `/reports`: bar ngang theo danh mục cho khoảng thời gian đã chọn, giữ kèm danh sách text (số liệu chính xác, vai trò "table view" cho accessibility)
+- [x] `CoupleComparisonChart` (`src/components/couple-comparison-chart.tsx`) trên `/reports`: so sánh chi tiêu chung 6 tháng gần đây giữa 2 người (chỉ hiện khi đã ghép cặp active)
+- [x] Báo cáo tóm tắt cuối tháng trên `/reports`: tổng chi tháng này, tăng/giảm % so tháng trước, danh mục chi nhiều nhất
+- [x] Settings: đổi tiền tệ (VND/USD) lưu vào `profiles.currency`; hiện trạng thái kết nối partner (chưa/đang chờ/đã kết nối) kèm link `/together`
+- [x] Xuất CSV: route handler `/settings/export` tải file `.csv` toàn bộ chi tiêu (kèm BOM để Excel đọc đúng tiếng Việt có dấu)
+- [x] PWA: `src/app/manifest.ts` + icon `192x192`/`512x512`/apple-touch-icon (placeholder màu terracotta — **cần thay bằng icon thiết kế thật khi có**), `themeColor` + `icons` trong `layout.tsx`
+- [x] `src/app/(app)/loading.tsx`: skeleton loading dùng chung cho mọi trang trong app khi chuyển route; rà soát lại thấy các empty state (chưa có khoản chi/thông báo/đóng góp...) đã có sẵn từ các giai đoạn trước
+- [x] Build/lint pass — không cần migration mới ở giai đoạn này
+- [ ] **Chưa làm** (ngoài phạm vi đợt này theo quyết định 2026-07-05): Web Push khi tắt hẳn app, polish UI sâu (thay màu sắc/token placeholder bằng thiết kế thật, kiểm tra responsive kỹ trên nhiều thiết bị thật, xuất CSV theo bộ lọc/khoảng thời gian thay vì toàn bộ)
+- [ ] **Bạn test tay**: mở `/reports` xem 2 chart hiện đúng số liệu, đổi tiền tệ ở Settings xem format tiền đổi theo đúng khắp app, bấm "Xuất CSV chi tiêu" xem file tải về mở bằng Excel đọc đúng dấu tiếng Việt, thử "Add to Home Screen" trên điện thoại xem cài được như app + icon hiện đúng màu terracotta
+
+**Milestone 7 (MVP hoàn chỉnh):** Code sẵn sàng — chờ bạn xác nhận test tay để chốt milestone. Sau khi chốt, ứng dụng đã đủ tính năng theo kế hoạch gốc để mời 1–2 cặp đôi thật dùng thử (trừ Web Push và polish UI sâu, để làm sau khi có phản hồi người dùng thật).
 
 ---
 
 ## Việc cần bạn làm tiếp theo (ngoài khả năng tự động của mình)
 
-Không có — Giai đoạn 0–6 đã test tay và xác nhận ổn (2026-07-05).
+1. Test tay Giai đoạn 7 (xem checklist ở trên): biểu đồ Báo cáo, đổi tiền tệ, xuất CSV, cài PWA lên điện thoại
 
 ## Bước tiếp theo trong roadmap
 
-Giai đoạn 7 — Báo cáo, biểu đồ & hoàn thiện: chart Recharts, PWA (manifest + installable), polish UI (màu sắc/token thật thay placeholder, spacing, empty/loading states), xuất CSV, và Web Push (đã hoãn từ Giai đoạn 5 theo lựa chọn của bạn ngày 2026-07-05).
+Toàn bộ roadmap gốc (Giai đoạn 0–7) đã code xong. Các việc còn lại ngoài phạm vi MVP ban đầu, làm sau khi có phản hồi người dùng thật: Web Push, polish UI/thiết kế thật thay placeholder, icon app thật thay bản đặt màu, xuất CSV có filter.
