@@ -49,3 +49,28 @@ body {
     padding-top: calc(env(safe-area-inset-top, 0px));
   }
 }
+
+/* Plays once whenever a page (re)mounts — pairs with staleTimes.dynamic in
+   next.config.ts so a fresh tab's content eases in instead of popping in
+   the instant new data streams in. Cached revisits within the stale window
+   don't remount, so this doesn't replay on every tab flip. */
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-page-in {
+  animation: page-in 0.25s ease-out;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-page-in {
+    animation: none;
+  }
+}

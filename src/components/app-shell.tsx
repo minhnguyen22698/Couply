@@ -87,7 +87,9 @@ export function AppShell({
   return (
     <ExpenseSheetProvider>
       <div className="flex min-h-full flex-1 flex-col bg-paper text-ink">
-        <main className="flex-1 pb-28">{children}</main>
+        <main key={pathname} className="animate-page-in flex-1 pb-28">
+          {children}
+        </main>
 
         <RealtimeNotifications
           userId={userId}

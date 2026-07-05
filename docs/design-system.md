@@ -19,6 +19,27 @@
 - Luôn có empty state (`text-ink/40`) và không bao giờ để trắng trang khi
   chưa có dữ liệu.
 
+## Điều hướng giữa các tab — giữ dữ liệu cũ, không "load lại từ đầu"
+
+Mọi trang trong `(app)` đều là Server Component động (đọc cookie phiên đăng
+nhập Supabase), nên mặc định Next.js coi là "dynamic" và **luôn fetch lại từ
+đầu** kể cả khi quay lại đúng tab vừa rời đi — đây là nguồn gốc cảm giác
+"load lại mỗi lần chuyển tab" (phản hồi 2026-07-05). Đã xử lý bằng 2 cơ chế
+kết hợp, không cần refactor sang Cache Components/PPR (rủi ro cao, gần như
+toàn bộ dữ liệu ở đây vốn đã gắn với user cụ thể nên không cache chéo được):
+
+1. **`next.config.ts` → `experimental.staleTimes.dynamic = 30`**: Router Cache
+   phía client giữ lại bản render gần nhất của mỗi tab trong 30 giây — quay
+   lại tab vừa xem trong khoảng đó thấy dữ liệu cũ ngay lập tức, không có
+   khoảng trắng/skeleton. `router.refresh()` sau mọi mutation (thêm/sửa/xoá
+   chi tiêu, ghép cặp, đóng góp quỹ...) vẫn bypass cache này nên dữ liệu bạn
+   vừa thay đổi luôn đúng ngay khi quay lại trang đó.
+2. **`.animate-page-in`** (`globals.css`) + `key={pathname}` trên `<main>`
+   trong `app-shell.tsx`: mỗi khi chuyển sang route khác (không phải đổi query
+   param trên cùng 1 trang, ví dụ bấm prev/next của PeriodSelector), nội dung
+   fade-in nhẹ thay vì đập vào mắt đột ngột — dù dữ liệu đến từ cache (tức
+   thì) hay phải fetch mới (sau khi `loading.tsx` hiện skeleton một chút).
+
 ## Màu sắc (`src/app/globals.css`)
 
 | Token | Hex | Vai trò | Không dùng cho |
