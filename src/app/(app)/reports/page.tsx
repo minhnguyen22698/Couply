@@ -2,11 +2,11 @@ import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/format";
 import { PeriodSelector } from "@/components/period-selector";
 import { getPeriodRange, parseAnchor, parsePeriod, toIso } from "@/lib/period";
+import { CategoryPieChart } from "@/components/category-pie-chart";
 import {
-  CategoryPieChart,
   foldTopCategories,
   type CategoryDatum,
-} from "@/components/category-pie-chart";
+} from "@/lib/category-breakdown";
 import {
   CoupleComparisonChart,
   type ComparisonDatum,
