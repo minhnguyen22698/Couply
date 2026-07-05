@@ -4,6 +4,7 @@ import {
   TogetherView,
   type SharedExpenseItem,
 } from "@/components/together-view";
+import { FundCard, type FundContributionItem } from "@/components/fund-card";
 
 function currentMonthRange() {
   const now = new Date();
@@ -52,7 +53,7 @@ export default async function TogetherPage() {
 
   const { start, end } = currentMonthRange();
 
-  const [{ data: partnerProfile }, { data: sharedExpenses }] =
+  const [{ data: partnerProfile }, { data: sharedExpenses }, { data: existingFund }] =
     await Promise.all([
       supabase
         .from("profiles")
@@ -70,8 +71,56 @@ export default async function TogetherPage() {
         .lt("spent_on", end)
         .order("spent_on", { ascending: false })
         .order("created_at", { ascending: false }),
+      supabase
+        .from("shared_funds")
+        .select("id, goal_amount")
+        .eq("couple_id", couple.id)
+        .maybeSingle(),
     ]);
   const partnerName = partnerProfile?.display_name ?? "Partner";
+
+  let fund = existingFund;
+  if (!fund) {
+    const { data: created } = await supabase
+      .from("shared_funds")
+      .insert({ couple_id: couple.id })
+      .select("id, goal_amount")
+      .single();
+    fund = created;
+  }
+
+  const [{ data: contributions }, { data: fundExpenses }] = await Promise.all([
+    supabase
+      .from("fund_contributions")
+      .select("id, user_id, amount, note, created_at")
+      .eq("fund_id", fund!.id)
+      .order("created_at", { ascending: false }),
+    supabase
+      .from("expenses")
+      .select("amount")
+      .eq("couple_id", couple.id)
+      .eq("visibility", "fund"),
+  ]);
+
+  const fundContributionItems: FundContributionItem[] = (
+    contributions ?? []
+  ).map((c) => ({
+    id: c.id,
+    amount: Number(c.amount),
+    note: c.note,
+    ownerName: c.user_id === user!.id ? "Bạn" : partnerName,
+    isMine: c.user_id === user!.id,
+  }));
+
+  const totalContributions = (contributions ?? []).reduce(
+    (sum, c) => sum + Number(c.amount),
+    0,
+  );
+  const totalFundExpenses = (fundExpenses ?? []).reduce(
+    (sum, e) => sum + Number(e.amount),
+    0,
+  );
+  const fundBalance = totalContributions - totalFundExpenses;
 
   const items: SharedExpenseItem[] = (sharedExpenses ?? []).map((row) => {
     const category = row.categories as unknown as {
@@ -108,6 +157,13 @@ export default async function TogetherPage() {
         myTotal={myTotal}
         partnerTotal={partnerTotal}
         items={items}
+      />
+      <FundCard
+        fundId={fund!.id}
+        goalAmount={fund!.goal_amount === null ? null : Number(fund!.goal_amount)}
+        balance={fundBalance}
+        currency={currency}
+        contributions={fundContributionItems}
       />
     </div>
   );

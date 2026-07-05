@@ -25,6 +25,12 @@ export default function SettingsPage() {
       >
         Quản lý danh mục
       </Link>
+      <Link
+        href="/settings/budgets"
+        className="w-fit rounded-xl border border-ink/15 px-4 py-2 text-sm"
+      >
+        Ngân sách
+      </Link>
       <button
         type="button"
         onClick={handleLogout}

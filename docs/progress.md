@@ -12,7 +12,7 @@
 | 3 — Chụp ảnh hóa đơn | Code xong, đã push migration — chờ bạn test tay |
 | 4 — Ghép cặp & chia sẻ | Code xong, đã push migration — chờ bạn test tay |
 | 5 — Thông báo real-time | Code xong, đã push migration — chờ bạn test tay |
-| 6 — Ngày/Tháng/Năm + Quỹ chung | Chưa bắt đầu |
+| 6 — Ngày/Tháng/Năm + Quỹ chung + Ngân sách | Code xong, đã push migration — chờ bạn test tay |
 | 7 — Báo cáo & hoàn thiện | Chưa bắt đầu |
 
 ---
@@ -96,22 +96,38 @@
 - [x] Toggle "Báo cho partner biết" trong bottom sheet thêm chi tiêu (mặc định bật, chỉ hiện khi có partner active và đang tạo mới — không áp dụng khi sửa)
 - [x] Migration đã push lên Supabase thật; build/lint pass
 - [ ] **Bạn test tay bằng 2 account thật**: mở app ở cả 2 máy/tab, account A thêm khoản chi Chia sẻ/Quỹ chung → xác nhận account B nhận toast + badge tăng gần như ngay lập tức khi đang mở app; tắt toggle "Báo cho partner biết" → xác nhận không có thông báo nhưng khoản chi vẫn hiện ở tab Chúng ta; mở `/notifications` → xác nhận badge về 0
+- [x] Sửa bug sau lần test đầu (2026-07-05): badge/toast không hiện — do subscribe Realtime trước khi JWT kịp gắn vào socket (race condition), đã sửa `getSession()` + `realtime.setAuth()` trước khi `.subscribe()`. Trang chậm — do các Server Component gọi Supabase tuần tự, đã gộp query độc lập chạy song song (`Promise.all`) ở layout + các trang chính. Tab "Chúng ta" không tự cập nhật — đã thêm `router.refresh()` mỗi khi có notification mới tới. **Cần test lại để xác nhận đã hết bug.**
+- [ ] Web Push (thông báo khi tắt app hẳn) — **chưa làm, đã quyết định để sau Giai đoạn 6** theo lựa chọn của bạn (2026-07-05). Cần: Service Worker + `manifest.json` (PWA), bảng `push_subscriptions`, VAPID keys, Edge Function gửi push. Lưu ý: iOS Safari chỉ nhận push nếu app được "Add to Home Screen" như PWA.
 
-**Milestone 5:** Code sẵn sàng — chờ bạn xác nhận test tay để chốt milestone.
+**Milestone 5:** Code sẵn sàng — chờ bạn test lại sau khi đã vá các bug ở trên.
 
-## GIAI ĐOẠN 6–7
+## GIAI ĐOẠN 6 — Ngày/Tháng/Năm + Quỹ chung + Ngân sách
 
-Chưa bắt đầu. Xem chi tiết từng việc ở `implementation-plan-couply.md`.
+- [x] `src/lib/period.ts` + `src/components/period-selector.tsx`: segmented control Ngày/Tháng/Năm dùng `searchParams` (`?period=&date=`), điều hướng lùi/tới bằng Link — không cần state client
+- [x] Dashboard: tổng chi theo khoảng đã chọn (thay vì cố định tháng hiện tại); "Gần đây" vẫn là 10 khoản mới nhất tổng thể
+- [x] Trang `/reports`: PeriodSelector + tổng chi + breakdown theo danh mục kèm % (chưa có chart — để Giai đoạn 7)
+- [x] Migration `supabase/migrations/20260708000001_shared_fund.sql`: bảng `shared_funds` (1 quỹ/couple) + `fund_contributions`, RLS chỉ cho 2 người trong couple active. Số dư = tổng đóng góp − tổng expense có `visibility = 'fund'` của couple đó (nối liền khái niệm "Quỹ chung" đã có từ Giai đoạn 4)
+- [x] `FundCard` (`src/components/fund-card.tsx`) trên tab Chúng ta: số dư, thanh progress theo mục tiêu, form đóng góp, lịch sử đóng góp từng người, đặt/sửa mục tiêu — quỹ được tự tạo (lazy) lần đầu couple mở tab Chúng ta
+- [x] Migration `supabase/migrations/20260708000002_budgets.sql`: bảng `budgets` (user_id, category_id, month, amount) + RLS chính chủ
+- [x] Trang `/settings/budgets`: đặt ngân sách theo danh mục cho từng tháng (điều hướng lùi/tới), thanh progress đổi màu khi ≥80%/≥100%
+- [x] Banner cảnh báo trên Dashboard khi danh mục nào trong tháng hiện tại đạt ≥80% ngân sách
+- [x] Migration đã push lên Supabase thật; build/lint pass
+- [ ] **Bạn test tay**: chuyển đổi Ngày/Tháng/Năm ở Dashboard và Báo cáo xem tổng có đúng không; 2 account góp quỹ chung xem số dư cộng đúng, thêm khoản chi "Quỹ chung" xem số dư trừ đúng; đặt ngân sách một danh mục thấp hơn mức đã chi, xác nhận thấy cảnh báo ở `/settings/budgets` và Dashboard
+
+**Milestone 6:** Code sẵn sàng — chờ bạn xác nhận test tay để chốt milestone.
+
+## GIAI ĐOẠN 7
+
+Chưa bắt đầu (biểu đồ Recharts, PWA, polish UI, xuất CSV...). Xem chi tiết ở `implementation-plan-couply.md`.
 
 ---
 
 ## Việc cần bạn làm tiếp theo (ngoài khả năng tự động của mình)
 
 1. Test tay Giai đoạn 4 bằng 2 account thật (xem checklist ở trên) — đặc biệt xác nhận khoản "Riêng tư" không lộ cho partner
-2. Test tay Giai đoạn 5 bằng 2 account thật (xem checklist ở trên)
+2. Test lại Giai đoạn 5 sau khi vá bug realtime/tốc độ (xem checklist ở trên)
+3. Test tay Giai đoạn 6: Ngày/Tháng/Năm, Quỹ chung, Ngân sách (xem checklist ở trên)
 
 ## Bước tiếp theo trong roadmap
 
-Giai đoạn 6 — Xem theo Ngày/Tháng/Năm + Quỹ chung: segmented control chuyển khoảng thời gian, bảng `shared_fund`/`fund_contributions`, bảng `budgets` với cảnh báo 80%/100%.
-
-Ghi chú: bạn có nhắc UI hiện còn xấu — theo kế hoạch, việc làm đẹp giao diện (màu sắc/token thật thay placeholder, spacing, polish component) được xếp vào Giai đoạn 7 sau khi đủ tính năng. Nếu muốn ưu tiên sớm hơn thì báo mình.
+Giai đoạn 7 — Báo cáo, biểu đồ & hoàn thiện: chart Recharts, PWA (manifest + installable), polish UI (màu sắc/token thật thay placeholder, spacing, empty/loading states), xuất CSV, và Web Push (đã hoãn từ Giai đoạn 5 theo lựa chọn của bạn ngày 2026-07-05).
