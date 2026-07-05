@@ -8,11 +8,11 @@
 |---|---|
 | 0 — Chuẩn bị | **Hoàn tất** |
 | 1 — Auth & nền tảng | **Hoàn tất** — Milestone 1 đạt (2026-07-05) |
-| 2 — CRUD chi tiêu cá nhân | Code xong, đã push migration — chờ bạn test tay |
-| 3 — Chụp ảnh hóa đơn | Code xong, đã push migration — chờ bạn test tay |
-| 4 — Ghép cặp & chia sẻ | Code xong, đã push migration — chờ bạn test tay |
-| 5 — Thông báo real-time | Code xong, đã push migration — chờ bạn test tay |
-| 6 — Ngày/Tháng/Năm + Quỹ chung + Ngân sách | Code xong, đã push migration — chờ bạn test tay |
+| 2 — CRUD chi tiêu cá nhân | **Hoàn tất** — Milestone 2 đạt (2026-07-05) |
+| 3 — Chụp ảnh hóa đơn | **Hoàn tất** — Milestone 3 đạt (2026-07-05) |
+| 4 — Ghép cặp & chia sẻ | **Hoàn tất** — Milestone 4 đạt (2026-07-05) |
+| 5 — Thông báo real-time | **Hoàn tất** — Milestone 5 đạt (2026-07-05) |
+| 6 — Ngày/Tháng/Năm + Quỹ chung + Ngân sách | **Hoàn tất** — Milestone 6 đạt (2026-07-05) |
 | 7 — Báo cáo & hoàn thiện | Chưa bắt đầu |
 
 ---
@@ -68,9 +68,9 @@
 - [x] Gắn `PhotoCapture` vào bottom sheet thêm/sửa chi tiêu, lưu `receipt_path` qua `createExpense`/`updateExpense`
 - [x] Xoá ảnh cũ trên Storage khi thay ảnh khác hoặc xoá khoản chi (`deleteExpense`, `updateExpense`)
 - [x] Migration đã push lên Supabase thật, xác nhận bucket `receipts` (private) tồn tại; build/lint pass
-- [ ] **Bạn test tay**: thêm ảnh hoá đơn vào 1 khoản chi, xem lại thumbnail + zoom, thử thay ảnh khác và xoá khoản chi để chắc file dọn theo
+- [x] **Đã test tay** (2026-07-05): thêm ảnh hoá đơn, xem thumbnail + zoom, thay ảnh khác và xoá khoản chi đều hoạt động đúng
 
-**Milestone 3:** Code sẵn sàng — chờ bạn xác nhận test tay để chốt milestone.
+**Milestone 3: ĐẠT (2026-07-05)**
 
 ## GIAI ĐOẠN 4 — Ghép cặp & chia sẻ
 
@@ -83,9 +83,9 @@
 - [x] Trang `/together`: hiện `CoupleConnect` khi chưa ghép cặp, hiện `TogetherView` (2 cột tổng chi tháng này + thanh cân bằng + danh sách chi tiêu chia sẻ) khi đã ghép cặp active, nút "Ngắt kết nối"
 - [x] Bottom sheet thêm/sửa chi tiêu: 3 nút Riêng tư/Chia sẻ/Quỹ chung (chỉ hiện khi đã có partner active) — `createExpense`/`updateExpense` tự tra `couple_id` phía server, ép về 'private' nếu client gửi lên mà không có partner active
 - [x] Migration đã push lên Supabase thật; build/lint pass
-- [ ] **Bạn test tay bằng 2 account thật**: ghép cặp qua mã mời, thêm khoản chi ở mức Chia sẻ/Quỹ chung từ account A → xác nhận account B thấy ở tab Chúng ta; thêm khoản Riêng tư → xác nhận account B KHÔNG thấy (đây là phần quan trọng nhất, cần test kỹ RLS); thử "Ngắt kết nối" rồi ghép lại
+- [x] **Đã test tay bằng 2 account thật** (2026-07-05): ghép cặp qua mã mời, chia sẻ/quỹ chung hiện đúng ở tab Chúng ta, khoản Riêng tư không lộ cho partner, ngắt kết nối và ghép lại đều ổn
 
-**Milestone 4:** Code sẵn sàng — chờ bạn xác nhận test tay với 2 account để chốt milestone.
+**Milestone 4: ĐẠT (2026-07-05)**
 
 ## GIAI ĐOẠN 5 — Thông báo real-time
 
@@ -95,11 +95,11 @@
 - [x] Trang `/notifications`: danh sách lịch sử, tự đánh dấu đã đọc khi mở trang
 - [x] Toggle "Báo cho partner biết" trong bottom sheet thêm chi tiêu (mặc định bật, chỉ hiện khi có partner active và đang tạo mới — không áp dụng khi sửa)
 - [x] Migration đã push lên Supabase thật; build/lint pass
-- [ ] **Bạn test tay bằng 2 account thật**: mở app ở cả 2 máy/tab, account A thêm khoản chi Chia sẻ/Quỹ chung → xác nhận account B nhận toast + badge tăng gần như ngay lập tức khi đang mở app; tắt toggle "Báo cho partner biết" → xác nhận không có thông báo nhưng khoản chi vẫn hiện ở tab Chúng ta; mở `/notifications` → xác nhận badge về 0
-- [x] Sửa bug sau lần test đầu (2026-07-05): badge/toast không hiện — do subscribe Realtime trước khi JWT kịp gắn vào socket (race condition), đã sửa `getSession()` + `realtime.setAuth()` trước khi `.subscribe()`. Trang chậm — do các Server Component gọi Supabase tuần tự, đã gộp query độc lập chạy song song (`Promise.all`) ở layout + các trang chính. Tab "Chúng ta" không tự cập nhật — đã thêm `router.refresh()` mỗi khi có notification mới tới. **Cần test lại để xác nhận đã hết bug.**
+- [x] Sửa bug sau lần test đầu (2026-07-05): badge/toast không hiện — do subscribe Realtime trước khi JWT kịp gắn vào socket (race condition), đã sửa `getSession()` + `realtime.setAuth()` trước khi `.subscribe()`. Trang chậm — do các Server Component gọi Supabase tuần tự, đã gộp query độc lập chạy song song (`Promise.all`) ở layout + các trang chính. Tab "Chúng ta" không tự cập nhật — đã thêm `router.refresh()` mỗi khi có notification mới tới.
+- [x] **Đã test lại và xác nhận ổn** (2026-07-05): toast/badge realtime hoạt động, tốc độ ổn, tab Chúng ta tự cập nhật
 - [ ] Web Push (thông báo khi tắt app hẳn) — **chưa làm, đã quyết định để sau Giai đoạn 6** theo lựa chọn của bạn (2026-07-05). Cần: Service Worker + `manifest.json` (PWA), bảng `push_subscriptions`, VAPID keys, Edge Function gửi push. Lưu ý: iOS Safari chỉ nhận push nếu app được "Add to Home Screen" như PWA.
 
-**Milestone 5:** Code sẵn sàng — chờ bạn test lại sau khi đã vá các bug ở trên.
+**Milestone 5: ĐẠT (2026-07-05)**
 
 ## GIAI ĐOẠN 6 — Ngày/Tháng/Năm + Quỹ chung + Ngân sách
 
@@ -112,9 +112,9 @@
 - [x] Trang `/settings/budgets`: đặt ngân sách theo danh mục cho từng tháng (điều hướng lùi/tới), thanh progress đổi màu khi ≥80%/≥100%
 - [x] Banner cảnh báo trên Dashboard khi danh mục nào trong tháng hiện tại đạt ≥80% ngân sách
 - [x] Migration đã push lên Supabase thật; build/lint pass
-- [ ] **Bạn test tay**: chuyển đổi Ngày/Tháng/Năm ở Dashboard và Báo cáo xem tổng có đúng không; 2 account góp quỹ chung xem số dư cộng đúng, thêm khoản chi "Quỹ chung" xem số dư trừ đúng; đặt ngân sách một danh mục thấp hơn mức đã chi, xác nhận thấy cảnh báo ở `/settings/budgets` và Dashboard
+- [x] **Đã test tay** (2026-07-05): chuyển Ngày/Tháng/Năm ra đúng tổng, góp quỹ chung cộng đúng số dư, khoản chi Quỹ chung trừ đúng, cảnh báo ngân sách hiện đúng ở `/settings/budgets` và Dashboard
 
-**Milestone 6:** Code sẵn sàng — chờ bạn xác nhận test tay để chốt milestone.
+**Milestone 6: ĐẠT (2026-07-05)**
 
 ## GIAI ĐOẠN 7
 
@@ -124,9 +124,7 @@ Chưa bắt đầu (biểu đồ Recharts, PWA, polish UI, xuất CSV...). Xem c
 
 ## Việc cần bạn làm tiếp theo (ngoài khả năng tự động của mình)
 
-1. Test tay Giai đoạn 4 bằng 2 account thật (xem checklist ở trên) — đặc biệt xác nhận khoản "Riêng tư" không lộ cho partner
-2. Test lại Giai đoạn 5 sau khi vá bug realtime/tốc độ (xem checklist ở trên)
-3. Test tay Giai đoạn 6: Ngày/Tháng/Năm, Quỹ chung, Ngân sách (xem checklist ở trên)
+Không có — Giai đoạn 0–6 đã test tay và xác nhận ổn (2026-07-05).
 
 ## Bước tiếp theo trong roadmap
 
