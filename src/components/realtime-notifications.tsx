@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 
 type NotificationPayload = {
@@ -22,6 +23,7 @@ export function RealtimeNotifications({
   userId: string;
   initialUnreadCount: number;
 }) {
+  const router = useRouter();
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
   const [toast, setToast] = useState<string | null>(null);
 
@@ -55,6 +57,9 @@ export function RealtimeNotifications({
               `🔔 ${data.owner_name} vừa thêm ${VISIBILITY_LABEL[data.visibility] ?? "khoản chi chia sẻ"}`,
             );
             setTimeout(() => setToast(null), 4000);
+            // Refetch the current page's server data so screens like "Chúng
+            // ta" or Dashboard reflect the new shared expense immediately.
+            router.refresh();
           },
         )
         .subscribe((status, err) => {
@@ -68,7 +73,7 @@ export function RealtimeNotifications({
       cancelled = true;
       if (channel) supabase.removeChannel(channel);
     };
-  }, [userId]);
+  }, [userId, router]);
 
   return (
     <>
