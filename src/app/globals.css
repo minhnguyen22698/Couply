@@ -57,16 +57,16 @@ body {
 @keyframes page-in {
   from {
     opacity: 0;
-    transform: translateY(4px);
+    transform: translateY(16px) scale(0.99);
   }
   to {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
 .animate-page-in {
-  animation: page-in 0.25s ease-out;
+  animation: page-in 0.45s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

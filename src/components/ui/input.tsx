@@ -63,6 +63,7 @@ export function AmountInput({
       <input
         type="text"
         inputMode="numeric"
+        autoComplete="off"
         value={display}
         onChange={(e) => setDigits(onlyDigits(e.target.value))}
         className={`w-full border border-ink/15 bg-white font-[family-name:var(--font-mono)] tabular-nums placeholder:text-ink/30 focus:border-a/50 ${AMOUNT_SIZES[size]} ${className}`}
