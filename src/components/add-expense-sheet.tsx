@@ -126,6 +126,18 @@ function ExpenseForm({
         </div>
       )}
 
+      {hasPartner && !editingExpense && (
+        <label className="flex items-center gap-2 text-sm text-ink/70">
+          <input
+            type="checkbox"
+            name="notifyPartner"
+            defaultChecked
+            className="h-4 w-4 rounded border-ink/30"
+          />
+          Báo cho partner biết
+        </label>
+      )}
+
       <div className="flex flex-col gap-1">
         <p className="text-sm text-ink/60">Ảnh hoá đơn</p>
         <input type="hidden" name="receiptPath" value={receiptPath ?? ""} />

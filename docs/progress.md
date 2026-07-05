@@ -11,7 +11,7 @@
 | 2 — CRUD chi tiêu cá nhân | Code xong, đã push migration — chờ bạn test tay |
 | 3 — Chụp ảnh hóa đơn | Code xong, đã push migration — chờ bạn test tay |
 | 4 — Ghép cặp & chia sẻ | Code xong, đã push migration — chờ bạn test tay |
-| 5 — Thông báo real-time | Chưa bắt đầu |
+| 5 — Thông báo real-time | Code xong, đã push migration — chờ bạn test tay |
 | 6 — Ngày/Tháng/Năm + Quỹ chung | Chưa bắt đầu |
 | 7 — Báo cáo & hoàn thiện | Chưa bắt đầu |
 
@@ -87,7 +87,19 @@
 
 **Milestone 4:** Code sẵn sàng — chờ bạn xác nhận test tay với 2 account để chốt milestone.
 
-## GIAI ĐOẠN 5–7
+## GIAI ĐOẠN 5 — Thông báo real-time
+
+- [x] Migration `supabase/migrations/20260707000001_notifications.sql`: bảng `notifications` (user_id, type, payload jsonb, is_read) + RLS (select/update chỉ chính chủ, insert chỉ cho phép tạo notification cho partner active của mình) + thêm bảng vào publication `supabase_realtime`
+- [x] `createExpense` tự tạo notification cho partner khi `visibility != 'private'` — không dùng trigger Postgres để toggle "Báo cho partner biết" ở form kiểm soát được việc này mà không cần thêm cột trên `expenses`
+- [x] `RealtimeNotifications` (`src/components/realtime-notifications.tsx`): subscribe `postgres_changes` INSERT trên `notifications` filter theo `user_id`, hiện toast 4 giây + badge chuông (góc trên phải, mọi trang trong app)
+- [x] Trang `/notifications`: danh sách lịch sử, tự đánh dấu đã đọc khi mở trang
+- [x] Toggle "Báo cho partner biết" trong bottom sheet thêm chi tiêu (mặc định bật, chỉ hiện khi có partner active và đang tạo mới — không áp dụng khi sửa)
+- [x] Migration đã push lên Supabase thật; build/lint pass
+- [ ] **Bạn test tay bằng 2 account thật**: mở app ở cả 2 máy/tab, account A thêm khoản chi Chia sẻ/Quỹ chung → xác nhận account B nhận toast + badge tăng gần như ngay lập tức khi đang mở app; tắt toggle "Báo cho partner biết" → xác nhận không có thông báo nhưng khoản chi vẫn hiện ở tab Chúng ta; mở `/notifications` → xác nhận badge về 0
+
+**Milestone 5:** Code sẵn sàng — chờ bạn xác nhận test tay để chốt milestone.
+
+## GIAI ĐOẠN 6–7
 
 Chưa bắt đầu. Xem chi tiết từng việc ở `implementation-plan-couply.md`.
 
@@ -96,7 +108,10 @@ Chưa bắt đầu. Xem chi tiết từng việc ở `implementation-plan-couply
 ## Việc cần bạn làm tiếp theo (ngoài khả năng tự động của mình)
 
 1. Test tay Giai đoạn 4 bằng 2 account thật (xem checklist ở trên) — đặc biệt xác nhận khoản "Riêng tư" không lộ cho partner
+2. Test tay Giai đoạn 5 bằng 2 account thật (xem checklist ở trên)
 
 ## Bước tiếp theo trong roadmap
 
-Giai đoạn 5 — Thông báo real-time: bảng `notifications`, trigger khi có expense chia sẻ mới, subscribe Supabase Realtime, toast trong app + trang lịch sử thông báo.
+Giai đoạn 6 — Xem theo Ngày/Tháng/Năm + Quỹ chung: segmented control chuyển khoảng thời gian, bảng `shared_fund`/`fund_contributions`, bảng `budgets` với cảnh báo 80%/100%.
+
+Ghi chú: bạn có nhắc UI hiện còn xấu — theo kế hoạch, việc làm đẹp giao diện (màu sắc/token thật thay placeholder, spacing, polish component) được xếp vào Giai đoạn 7 sau khi đủ tính năng. Nếu muốn ưu tiên sớm hơn thì báo mình.

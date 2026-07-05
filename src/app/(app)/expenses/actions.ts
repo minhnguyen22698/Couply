@@ -36,6 +36,41 @@ async function resolveSharing(
   return { visibility, coupleId: couple.id as string };
 }
 
+async function notifyPartner(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  userId: string,
+  coupleId: string,
+  amount: number,
+  visibility: "shared" | "fund",
+) {
+  const { data: couple } = await supabase
+    .from("couples")
+    .select("user_a_id, user_b_id")
+    .eq("id", coupleId)
+    .single();
+  if (!couple) return;
+
+  const partnerId =
+    couple.user_a_id === userId ? couple.user_b_id : couple.user_a_id;
+  if (!partnerId) return;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", userId)
+    .single();
+
+  await supabase.from("notifications").insert({
+    user_id: partnerId,
+    type: "expense_shared",
+    payload: {
+      owner_name: profile?.display_name ?? "Đối tác",
+      amount,
+      visibility,
+    },
+  });
+}
+
 export async function createExpense(
   _prevState: ExpenseFormState,
   formData: FormData,
@@ -71,6 +106,11 @@ export async function createExpense(
   });
 
   if (error) return { error: "Không lưu được khoản chi, thử lại." };
+
+  const notifyPartnerToggle = formData.get("notifyPartner") === "on";
+  if (visibility !== "private" && coupleId && notifyPartnerToggle) {
+    await notifyPartner(supabase, user.id, coupleId, amount, visibility);
+  }
 
   revalidatePath("/dashboard");
   revalidatePath("/expenses");

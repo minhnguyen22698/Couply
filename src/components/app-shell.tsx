@@ -8,6 +8,7 @@ import {
   ExpenseSheetProvider,
   useExpenseSheet,
 } from "@/components/expense-sheet-context";
+import { RealtimeNotifications } from "@/components/realtime-notifications";
 
 const NAV_ITEMS = [
   { href: "/dashboard", label: "Tổng quan" },
@@ -35,11 +36,13 @@ export function AppShell({
   categories,
   userId,
   hasPartner,
+  unreadNotifications,
 }: {
   children: React.ReactNode;
   categories: ExpenseCategory[];
   userId: string;
   hasPartner: boolean;
+  unreadNotifications: number;
 }) {
   const pathname = usePathname();
 
@@ -47,6 +50,11 @@ export function AppShell({
     <ExpenseSheetProvider>
       <div className="flex min-h-full flex-1 flex-col bg-paper text-ink">
         <main className="flex-1 pb-24">{children}</main>
+
+        <RealtimeNotifications
+          userId={userId}
+          initialUnreadCount={unreadNotifications}
+        />
 
         <Fab />
 
