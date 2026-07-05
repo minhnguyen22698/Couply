@@ -5,6 +5,8 @@ import { normalizeExpenseRow } from "@/lib/expenses";
 import { ExpenseRow } from "@/components/expense-row";
 import { PeriodSelector } from "@/components/period-selector";
 import { getPeriodRange, parseAnchor, parsePeriod, toIso } from "@/lib/period";
+import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 
 function currentMonthIso() {
   const now = new Date();
@@ -114,33 +116,41 @@ export default async function DashboardPage({
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-10">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl">
-        Chào, {profile?.display_name ?? "bạn"} 👋
-      </h1>
+      <PageHeader title={`Chào, ${profile?.display_name ?? "bạn"} 👋`} />
 
       {budgetWarnings.length > 0 && (
-        <div className="flex flex-col gap-1 rounded-2xl border border-a/30 bg-a/10 p-4">
-          {budgetWarnings.map((w) => (
-            <p key={w.categoryId} className="text-sm text-a">
-              {w.icon} {w.name}:{" "}
-              {w.percent >= 100
-                ? `đã vượt ngân sách tháng này (${w.percent}%)`
-                : `sắp đạt ngân sách tháng này (${w.percent}%)`}
-            </p>
-          ))}
+        <div className="flex flex-col gap-1">
+          {budgetWarnings.map((w) => {
+            const isOver = w.percent >= 100;
+            return (
+              <div
+                key={w.categoryId}
+                className={`rounded-2xl border p-4 text-sm ${
+                  isOver
+                    ? "border-danger/30 bg-danger/10 text-danger"
+                    : "border-gold/40 bg-gold/10 text-ink"
+                }`}
+              >
+                {w.icon} {w.name}:{" "}
+                {isOver
+                  ? `đã vượt ngân sách tháng này (${w.percent}%)`
+                  : `sắp đạt ngân sách tháng này (${w.percent}%)`}
+              </div>
+            );
+          })}
         </div>
       )}
 
       <PeriodSelector basePath="/dashboard" period={period} anchor={anchor} />
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <p className="text-sm text-ink/60">Tổng chi</p>
         <p className="font-[family-name:var(--font-mono)] text-3xl">
           {formatCurrency(total, currency)}
         </p>
-      </div>
+      </Card>
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <div className="flex items-center justify-between">
           <p className="text-sm text-ink/60">Gần đây</p>
           <Link href="/expenses" className="text-sm text-a">
@@ -162,7 +172,7 @@ export default async function DashboardPage({
         ) : (
           <p className="mt-2 text-ink/40">Chưa có khoản chi nào.</p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

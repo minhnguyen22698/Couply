@@ -52,7 +52,7 @@ export function ExpenseRow({
         type="button"
         onClick={handleDelete}
         disabled={isPending}
-        className="text-sm text-ink/40"
+        className="text-sm text-danger/70 disabled:opacity-40"
       >
         Xoá
       </button>

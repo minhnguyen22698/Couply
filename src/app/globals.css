@@ -4,10 +4,11 @@
   --background: var(--paper);
   --foreground: var(--ink);
 
-  /* Couply design tokens — placeholder values, chỉnh lại theo mockup đã chốt */
-  --a: #c1633b; /* terracotta */
-  --b: #5f8575; /* sage teal */
-  --gold: #c9a227;
+  /* Couply design tokens — see docs/design-system.md for usage rules. */
+  --a: #c1633b; /* terracotta — brand / primary action */
+  --b: #5f8575; /* sage teal — partner identity / positive */
+  --gold: #c9a227; /* warning (approaching a limit) */
+  --danger: #c0392b; /* error / over a limit — never reuse --a for this */
   --ink: #211f1c;
   --paper: #faf6ef;
 }
@@ -18,6 +19,7 @@
   --color-a: var(--a);
   --color-b: var(--b);
   --color-gold: var(--gold);
+  --color-danger: var(--danger);
   --color-ink: var(--ink);
   --color-paper: var(--paper);
   --font-display: var(--font-fraunces);
@@ -29,4 +31,21 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid var(--a);
+  outline-offset: 2px;
+}
+
+@layer utilities {
+  /* Fixed chrome (bottom nav, FAB, sheets) sits above the OS home
+     indicator / notch only when these are used — viewport-fit=cover is
+     set in layout.tsx so env() actually resolves instead of reading 0. */
+  .pb-safe {
+    padding-bottom: calc(env(safe-area-inset-bottom, 0px));
+  }
+  .pt-safe {
+    padding-top: calc(env(safe-area-inset-top, 0px));
+  }
 }

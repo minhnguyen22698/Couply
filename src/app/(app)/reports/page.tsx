@@ -7,6 +7,8 @@ import {
   CoupleComparisonChart,
   type ComparisonDatum,
 } from "@/components/couple-comparison-chart";
+import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 
 type CategoryTotal = {
   categoryId: string | null;
@@ -199,11 +201,9 @@ export default async function ReportsPage({
 
   return (
     <div className="flex flex-col gap-6 px-5 pt-10">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl">
-        Báo cáo
-      </h1>
+      <PageHeader title="Báo cáo" />
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <p className="text-sm text-ink/60">Tóm tắt tháng này</p>
         <p className="mt-1 font-[family-name:var(--font-mono)] text-2xl">
           {formatCurrency(thisMonthTotal, currency)}
@@ -221,18 +221,18 @@ export default async function ReportsPage({
             {formatCurrency(topCategory.total, currency)})
           </p>
         )}
-      </div>
+      </Card>
 
       <PeriodSelector basePath="/reports" period={period} anchor={anchor} />
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <p className="text-sm text-ink/60">Tổng chi</p>
         <p className="font-[family-name:var(--font-mono)] text-3xl">
           {formatCurrency(total, currency)}
         </p>
-      </div>
+      </Card>
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <p className="mb-2 text-sm text-ink/60">Theo danh mục</p>
         {breakdown.length > 0 ? (
           <>
@@ -260,10 +260,10 @@ export default async function ReportsPage({
         ) : (
           <p className="text-ink/40">Chưa có khoản chi nào trong khoảng này.</p>
         )}
-      </div>
+      </Card>
 
       {comparisonData && (
-        <div className="rounded-2xl border border-ink/10 bg-white p-5">
+        <Card>
           <p className="mb-2 text-sm text-ink/60">
             So sánh chi tiêu chung — 6 tháng gần đây
           </p>
@@ -272,7 +272,7 @@ export default async function ReportsPage({
             partnerName={partnerName}
             currency={currency}
           />
-        </div>
+        </Card>
       )}
     </div>
   );

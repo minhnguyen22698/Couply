@@ -1,6 +1,11 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/format";
+import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { IconLinkButton } from "@/components/ui/icon-button";
 import { setBudget } from "./actions";
 
 function monthRange(monthIso: string) {
@@ -78,26 +83,18 @@ export default async function BudgetsPage({
       <Link href="/settings" className="text-sm text-ink/60">
         ← Cài đặt
       </Link>
-      <h1 className="font-[family-name:var(--font-display)] text-2xl">
-        Ngân sách
-      </h1>
+      <PageHeader title="Ngân sách" />
 
       <div className="flex items-center justify-between">
-        <Link
-          href={`/settings/budgets?month=${shiftMonth(month, -1)}`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-sm"
-        >
+        <IconLinkButton href={`/settings/budgets?month=${shiftMonth(month, -1)}`}>
           ←
-        </Link>
+        </IconLinkButton>
         <p className="font-medium">
           Tháng {Number(month.split("-")[1])}/{month.split("-")[0]}
         </p>
-        <Link
-          href={`/settings/budgets?month=${shiftMonth(month, 1)}`}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-sm"
-        >
+        <IconLinkButton href={`/settings/budgets?month=${shiftMonth(month, 1)}`}>
           →
-        </Link>
+        </IconLinkButton>
       </div>
 
       <div className="flex flex-col gap-3">
@@ -105,20 +102,19 @@ export default async function BudgetsPage({
           const budget = budgetByCategory.get(category.id) ?? null;
           const spent = spentByCategory.get(category.id) ?? 0;
           const percent = budget ? Math.round((spent / budget) * 100) : null;
+          const isOver = percent !== null && percent >= 100;
+          const isWarning = percent !== null && percent >= 80 && !isOver;
           const barColor =
             percent === null
               ? "bg-ink/20"
-              : percent >= 100
-                ? "bg-a"
-                : percent >= 80
+              : isOver
+                ? "bg-danger"
+                : isWarning
                   ? "bg-gold"
                   : "bg-b";
 
           return (
-            <div
-              key={category.id}
-              className="rounded-2xl border border-ink/10 bg-white p-4"
-            >
+            <Card key={category.id} className="p-4">
               <div className="flex items-center justify-between text-sm">
                 <span>
                   {category.icon} {category.name}
@@ -137,11 +133,11 @@ export default async function BudgetsPage({
                   />
                 </div>
               )}
-              {percent !== null && percent >= 80 && (
-                <p className="mt-1 text-xs text-a">
-                  {percent >= 100
-                    ? "Đã vượt ngân sách!"
-                    : "Sắp đạt ngân sách (80%+)"}
+              {(isOver || isWarning) && (
+                <p
+                  className={`mt-1 text-xs ${isOver ? "text-danger" : "text-ink/70"}`}
+                >
+                  {isOver ? "Đã vượt ngân sách!" : "Sắp đạt ngân sách (80%+)"}
                 </p>
               )}
 
@@ -149,22 +145,19 @@ export default async function BudgetsPage({
                 action={setBudget.bind(null, category.id, monthDate)}
                 className="mt-2 flex gap-2"
               >
-                <input
+                <Input
                   name="amount"
                   type="text"
                   inputMode="decimal"
                   placeholder="Đặt ngân sách"
                   defaultValue={budget ?? ""}
-                  className="flex-1 rounded-xl border border-ink/15 px-3 py-1.5 text-sm"
+                  className="text-sm"
                 />
-                <button
-                  type="submit"
-                  className="rounded-xl bg-a px-3 py-1.5 text-sm text-paper"
-                >
+                <Button type="submit" size="sm">
                   Lưu
-                </button>
+                </Button>
               </form>
-            </div>
+            </Card>
           );
         })}
       </div>

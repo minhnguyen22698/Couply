@@ -10,6 +10,7 @@ import {
   YAxis,
 } from "recharts";
 import { formatCurrency } from "@/lib/format";
+import { palette } from "@/lib/palette";
 
 export type CategoryDatum = { name: string; icon: string; total: number };
 
@@ -35,13 +36,13 @@ export function CategoryBarChart({
         layout="vertical"
         margin={{ left: 8, right: 24, top: 4, bottom: 4 }}
       >
-        <CartesianGrid horizontal={false} stroke="#e1e0d9" />
+        <CartesianGrid horizontal={false} stroke={palette.gridline} />
         <XAxis type="number" hide />
         <YAxis
           type="category"
           dataKey="label"
           width={130}
-          tick={{ fontSize: 12, fill: "#52514e" }}
+          tick={{ fontSize: 12, fill: palette.inkSecondary }}
           axisLine={false}
           tickLine={false}
         />
@@ -50,11 +51,11 @@ export function CategoryBarChart({
           labelFormatter={() => ""}
           contentStyle={{
             borderRadius: 12,
-            border: "1px solid #e1e0d9",
+            border: `1px solid ${palette.gridline}`,
             fontSize: 12,
           }}
         />
-        <Bar dataKey="total" fill="#c1633b" radius={[0, 4, 4, 0]} barSize={20} />
+        <Bar dataKey="total" fill={palette.a} radius={[0, 4, 4, 0]} barSize={20} />
       </BarChart>
     </ResponsiveContainer>
   );

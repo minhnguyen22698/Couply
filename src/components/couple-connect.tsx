@@ -3,6 +3,8 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { createInvite, joinInvite } from "@/app/(app)/together/actions";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
   const router = useRouter();
@@ -43,7 +45,7 @@ export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
 
   if (pendingCode) {
     return (
-      <div className="flex flex-col gap-4 rounded-2xl border border-ink/10 bg-white p-5">
+      <Card className="flex flex-col gap-4">
         <p className="text-sm text-ink/60">
           Chia sẻ mã này với partner để ghép cặp
         </p>
@@ -51,39 +53,42 @@ export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
           {pendingCode}
         </p>
         <div className="flex gap-3">
-          <button
+          <Button
             type="button"
+            variant="outline"
+            size="lg"
             onClick={handleCopy}
-            className="flex-1 rounded-2xl border border-ink/15 px-4 py-2.5 text-sm"
+            className="flex-1"
           >
             {copied ? "Đã sao chép" : "Sao chép mã"}
-          </button>
-          <button
+          </Button>
+          <Button
             type="button"
+            size="lg"
             onClick={() => router.refresh()}
-            className="flex-1 rounded-2xl bg-a px-4 py-2.5 text-sm text-paper"
+            className="flex-1"
           >
             Đã ghép xong?
-          </button>
+          </Button>
         </div>
-        {error && <p className="text-sm text-a">{error}</p>}
-      </div>
+        {error && <p className="text-sm text-danger">{error}</p>}
+      </Card>
     );
   }
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-3 rounded-2xl border border-ink/10 bg-white p-5">
+      <Card className="flex flex-col gap-3">
         <p className="text-sm text-ink/60">Chưa kết nối với ai</p>
-        <button
+        <Button
           type="button"
+          size="lg"
           onClick={handleCreateInvite}
           disabled={isPending}
-          className="rounded-2xl bg-a px-4 py-3 font-medium text-paper disabled:opacity-60"
         >
           Tạo mã mời
-        </button>
-      </div>
+        </Button>
+      </Card>
 
       <form
         action={handleJoin}
@@ -98,16 +103,12 @@ export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
           required
           className="rounded-2xl border border-ink/15 bg-white px-4 py-3 text-center font-[family-name:var(--font-mono)] text-xl tracking-[0.3em]"
         />
-        <button
-          type="submit"
-          disabled={isPending}
-          className="rounded-2xl border border-ink/15 px-4 py-2.5 text-sm disabled:opacity-60"
-        >
+        <Button type="submit" variant="outline" size="lg" disabled={isPending}>
           {isPending ? "Đang ghép…" : "Ghép cặp"}
-        </button>
+        </Button>
       </form>
 
-      {error && <p className="text-sm text-a">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
     </div>
   );
 }

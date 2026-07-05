@@ -4,6 +4,8 @@ import { useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { disconnectPartner } from "@/app/(app)/together/actions";
 import { formatCurrency } from "@/lib/format";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
 export type SharedExpenseItem = {
   id: string;
@@ -49,7 +51,7 @@ export function TogetherView({
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <p className="text-sm text-ink/60">Chia sẻ tháng này</p>
         <div className="mt-2 flex justify-between font-[family-name:var(--font-mono)] text-sm">
           <span className="text-a">Bạn: {formatCurrency(myTotal, currency)}</span>
@@ -61,9 +63,9 @@ export function TogetherView({
           <div className="h-full bg-a" style={{ width: `${myShare}%` }} />
           <div className="h-full bg-b" style={{ width: `${100 - myShare}%` }} />
         </div>
-      </div>
+      </Card>
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <p className="text-sm text-ink/60">Chi tiêu chia sẻ</p>
         {items.length > 0 ? (
           <div className="mt-2">
@@ -94,16 +96,17 @@ export function TogetherView({
         ) : (
           <p className="mt-2 text-ink/40">Chưa có khoản chi chia sẻ nào.</p>
         )}
-      </div>
+      </Card>
 
-      <button
+      <Button
         type="button"
+        variant="danger-outline"
         onClick={handleDisconnect}
         disabled={isPending}
-        className="w-fit rounded-xl border border-ink/15 px-4 py-2 text-sm text-ink/60 disabled:opacity-60"
+        className="w-fit"
       >
         Ngắt kết nối partner
-      </button>
+      </Button>
     </div>
   );
 }

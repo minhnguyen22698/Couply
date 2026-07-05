@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 
 export function LogoutButton() {
   const router = useRouter();
@@ -14,12 +15,13 @@ export function LogoutButton() {
   }
 
   return (
-    <button
+    <Button
       type="button"
+      variant="outline"
       onClick={handleLogout}
-      className="w-fit rounded-xl border border-ink/15 px-4 py-2 text-sm"
+      className="w-fit"
     >
       Đăng xuất
-    </button>
+    </Button>
   );
 }

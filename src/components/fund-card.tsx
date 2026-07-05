@@ -7,6 +7,9 @@ import {
   setFundGoal,
 } from "@/app/(app)/together/fund-actions";
 import { formatCurrency } from "@/lib/format";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 export type FundContributionItem = {
   id: string;
@@ -65,7 +68,7 @@ export function FundCard({
   }
 
   return (
-    <div className="flex flex-col gap-4 rounded-2xl border border-ink/10 bg-white p-5">
+    <Card className="flex flex-col gap-4">
       <div className="flex items-center justify-between">
         <p className="text-sm text-ink/60">Quỹ chung</p>
         <button
@@ -97,51 +100,38 @@ export function FundCard({
 
       {editingGoal && (
         <form action={handleSetGoal} className="flex gap-2">
-          <input
+          <Input
             name="goalAmount"
             type="text"
             inputMode="decimal"
             placeholder="Số tiền mục tiêu"
             defaultValue={goalAmount ?? ""}
-            className="flex-1 rounded-xl border border-ink/15 px-3 py-2 text-sm"
+            className="text-sm"
           />
-          <button
-            type="submit"
-            disabled={isPending}
-            className="rounded-xl bg-a px-4 py-2 text-sm text-paper disabled:opacity-60"
-          >
+          <Button type="submit" disabled={isPending}>
             Lưu
-          </button>
+          </Button>
         </form>
       )}
 
       <form action={handleContribute} className="flex flex-col gap-2">
         <div className="flex gap-2">
-          <input
+          <Input
             name="amount"
             type="text"
             inputMode="decimal"
             placeholder="Đóng góp..."
             required
-            className="flex-1 rounded-xl border border-ink/15 px-3 py-2 text-sm"
+            className="text-sm"
           />
-          <button
-            type="submit"
-            disabled={isPending}
-            className="rounded-xl bg-a px-4 py-2 text-sm text-paper disabled:opacity-60"
-          >
+          <Button type="submit" disabled={isPending}>
             Góp
-          </button>
+          </Button>
         </div>
-        <input
-          name="note"
-          type="text"
-          placeholder="Ghi chú (tuỳ chọn)"
-          className="rounded-xl border border-ink/15 px-3 py-2 text-sm"
-        />
+        <Input name="note" type="text" placeholder="Ghi chú (tuỳ chọn)" className="text-sm" />
       </form>
 
-      {error && <p className="text-sm text-a">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <div className="flex flex-col gap-2">
         <p className="text-sm text-ink/60">Lịch sử đóng góp</p>
@@ -164,6 +154,6 @@ export function FundCard({
           <p className="text-sm text-ink/40">Chưa có đóng góp nào.</p>
         )}
       </div>
-    </div>
+    </Card>
   );
 }

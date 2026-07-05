@@ -13,7 +13,8 @@
 | 4 — Ghép cặp & chia sẻ | **Hoàn tất** — Milestone 4 đạt (2026-07-05) |
 | 5 — Thông báo real-time | **Hoàn tất** — Milestone 5 đạt (2026-07-05) |
 | 6 — Ngày/Tháng/Năm + Quỹ chung + Ngân sách | **Hoàn tất** — Milestone 6 đạt (2026-07-05) |
-| 7 — Báo cáo & hoàn thiện | Code xong (trừ Web Push + polish UI sâu) — chờ bạn test tay |
+| 7 — Báo cáo & hoàn thiện | **Hoàn tất** — Milestone 7 đạt (2026-07-05), trừ Web Push (hoãn) |
+| — Chuẩn hoá UI/UX toàn app | **Hoàn tất** (2026-07-05) — xem mục riêng bên dưới + `docs/design-system.md` |
 
 ---
 
@@ -127,17 +128,33 @@
 - [x] PWA: `src/app/manifest.ts` + icon `192x192`/`512x512`/apple-touch-icon (placeholder màu terracotta — **cần thay bằng icon thiết kế thật khi có**), `themeColor` + `icons` trong `layout.tsx`
 - [x] `src/app/(app)/loading.tsx`: skeleton loading dùng chung cho mọi trang trong app khi chuyển route; rà soát lại thấy các empty state (chưa có khoản chi/thông báo/đóng góp...) đã có sẵn từ các giai đoạn trước
 - [x] Build/lint pass — không cần migration mới ở giai đoạn này
-- [ ] **Chưa làm** (ngoài phạm vi đợt này theo quyết định 2026-07-05): Web Push khi tắt hẳn app, polish UI sâu (thay màu sắc/token placeholder bằng thiết kế thật, kiểm tra responsive kỹ trên nhiều thiết bị thật, xuất CSV theo bộ lọc/khoảng thời gian thay vì toàn bộ)
-- [ ] **Bạn test tay**: mở `/reports` xem 2 chart hiện đúng số liệu, đổi tiền tệ ở Settings xem format tiền đổi theo đúng khắp app, bấm "Xuất CSV chi tiêu" xem file tải về mở bằng Excel đọc đúng dấu tiếng Việt, thử "Add to Home Screen" trên điện thoại xem cài được như app + icon hiện đúng màu terracotta
+- [ ] **Chưa làm** (ngoài phạm vi, hoãn theo quyết định 2026-07-05): Web Push khi tắt hẳn app, xuất CSV theo bộ lọc/khoảng thời gian thay vì toàn bộ
+- [x] **Đã test tay** (2026-07-05): biểu đồ Báo cáo, đổi tiền tệ, xuất CSV, cài PWA lên điện thoại — xác nhận ổn
 
-**Milestone 7 (MVP hoàn chỉnh):** Code sẵn sàng — chờ bạn xác nhận test tay để chốt milestone. Sau khi chốt, ứng dụng đã đủ tính năng theo kế hoạch gốc để mời 1–2 cặp đôi thật dùng thử (trừ Web Push và polish UI sâu, để làm sau khi có phản hồi người dùng thật).
+**Milestone 7 (MVP hoàn chỉnh): ĐẠT (2026-07-05)** — đủ tính năng theo kế hoạch gốc để mời 1–2 cặp đôi thật dùng thử (trừ Web Push, để làm sau khi có phản hồi người dùng thật).
+
+---
+
+## Chuẩn hoá UI/UX toàn app (2026-07-05)
+
+Sau khi chốt Milestone 7, bạn yêu cầu chỉnh lại toàn bộ UI/UX cho hợp lý và đồng bộ giữa các màn hình, thiết kế mobile-first. Đã làm:
+
+- [x] **Design tokens** (`src/app/globals.css`): tách riêng `--danger` (đỏ, lỗi/vượt ngân sách) khỏi `--a` (terracotta, brand/CTA) — trước đó lỗi form và nút chính dùng chung 1 màu, gây mơ hồ. `--gold` chính thức là màu cảnh báo 80%. Thêm `viewportFit: "cover"` trong `layout.tsx` để `env(safe-area-inset-*)` hoạt động.
+- [x] **`src/lib/palette.ts`**: mirror màu cho Recharts (SVG không đọc được CSS custom properties).
+- [x] **UI primitives dùng chung** (`src/components/ui/`): `Button` (3 variant × 3 size), `Card`, `PageHeader`, `Input`/`Select`/`AmountInput`, `IconButton`/`IconLinkButton`, `ListRow` — thay cho việc mỗi trang tự viết class Tailwind tay, đảm bảo đồng bộ tuyệt đối.
+- [x] **Mobile-first + safe-area**: bottom nav, FAB, chuông thông báo, bottom sheet thêm chi tiêu đều cộng `env(safe-area-inset-*)` để không bị tai thỏ/home indicator che; vùng chạm nút chính nâng lên ≥44px; z-index chuẩn hoá theo lớp (nav/FAB → chuông/toast → bottom sheet → ảnh phóng to).
+- [x] Áp dụng primitives vào **toàn bộ 13 trang** (dashboard, expenses, together, reports, settings + budgets/categories/export, notifications, login, onboarding) và **toàn bộ form/sheet** (thêm chi tiêu, ghép cặp, quỹ chung, ngân sách, danh mục).
+- [x] Sửa các chỗ dùng sai màu ngữ nghĩa: thông báo lỗi và nút "Xoá"/"Ngắt kết nối" trước dùng `text-a` (trùng màu CTA) → đổi `text-danger`; cảnh báo ngân sách 80%/100% giờ tách rõ vàng/đỏ thay vì cùng màu cam.
+- [x] **`docs/design-system.md`**: tài liệu tham chiếu token màu, typography, spacing/radius scale, danh sách component dùng chung, quy tắc safe-area — để giữ đồng bộ khi thêm màn hình mới sau này.
+- [x] Verify trực quan: dựng dev server, chụp màn hình `/login` qua Playwright ở viewport 390px và 360px (không có lỗi console, không tràn ngang), build/lint pass. Các trang cần đăng nhập (dashboard, together, reports...) không tự động hoá được (cần phiên Google OAuth thật) — **bạn cần tự kiểm tra bằng mắt** trên các trang đó.
+- [ ] **Bạn kiểm tra bằng mắt**: lướt qua toàn bộ app trên điện thoại thật, xác nhận giao diện đồng bộ giữa các trang, không có phần tử fixed nào che nhau hoặc bị tai thỏ/home indicator che, nút bấm dễ chạm.
 
 ---
 
 ## Việc cần bạn làm tiếp theo (ngoài khả năng tự động của mình)
 
-1. Test tay Giai đoạn 7 (xem checklist ở trên): biểu đồ Báo cáo, đổi tiền tệ, xuất CSV, cài PWA lên điện thoại
+1. Kiểm tra bằng mắt việc chuẩn hoá UI/UX trên điện thoại thật (xem mục ở trên)
 
 ## Bước tiếp theo trong roadmap
 
-Toàn bộ roadmap gốc (Giai đoạn 0–7) đã code xong. Các việc còn lại ngoài phạm vi MVP ban đầu, làm sau khi có phản hồi người dùng thật: Web Push, polish UI/thiết kế thật thay placeholder, icon app thật thay bản đặt màu, xuất CSV có filter.
+Toàn bộ roadmap gốc (Giai đoạn 0–7) đã code xong và test tay đạt. Việc còn lại ngoài phạm vi MVP, làm sau khi có phản hồi người dùng thật: Web Push, icon app thiết kế thật (đang là hình vuông đặc màu terracotta), xuất CSV có filter.

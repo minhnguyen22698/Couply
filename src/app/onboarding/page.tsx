@@ -1,6 +1,8 @@
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { completeOnboarding } from "./actions";
+import { Button } from "@/components/ui/button";
+import { Input, Select } from "@/components/ui/input";
 
 const CURRENCIES = ["VND", "USD"];
 
@@ -30,7 +32,7 @@ export default async function OnboardingPage({
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 bg-paper px-6 py-16 text-ink">
+    <main className="flex flex-1 flex-col items-center justify-center gap-8 bg-paper px-6 pt-[calc(4rem+env(safe-area-inset-top,0px))] pb-[calc(4rem+env(safe-area-inset-bottom,0px))] text-ink">
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="font-[family-name:var(--font-display)] text-3xl">
           Chào mừng đến với Couply
@@ -46,12 +48,11 @@ export default async function OnboardingPage({
           <label htmlFor="displayName" className="text-sm text-ink/70">
             Tên hiển thị
           </label>
-          <input
+          <Input
             id="displayName"
             name="displayName"
             defaultValue={profile?.display_name ?? ""}
             required
-            className="rounded-xl border border-ink/15 bg-white px-4 py-2"
           />
         </div>
 
@@ -59,30 +60,26 @@ export default async function OnboardingPage({
           <label htmlFor="currency" className="text-sm text-ink/70">
             Tiền tệ
           </label>
-          <select
+          <Select
             id="currency"
             name="currency"
             defaultValue={profile?.currency ?? "VND"}
-            className="rounded-xl border border-ink/15 bg-white px-4 py-2"
           >
             {CURRENCIES.map((currency) => (
               <option key={currency} value={currency}>
                 {currency}
               </option>
             ))}
-          </select>
+          </Select>
         </div>
 
         {error && (
-          <p className="text-sm text-a">Có lỗi xảy ra, vui lòng thử lại.</p>
+          <p className="text-sm text-danger">Có lỗi xảy ra, vui lòng thử lại.</p>
         )}
 
-        <button
-          type="submit"
-          className="rounded-2xl bg-a px-5 py-3 font-medium text-paper"
-        >
+        <Button type="submit" size="lg">
           Bắt đầu
-        </button>
+        </Button>
       </form>
     </main>
   );

@@ -1,6 +1,10 @@
-import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { LogoutButton } from "@/components/logout-button";
+import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
+import { Button } from "@/components/ui/button";
+import { Select } from "@/components/ui/input";
+import { ListRow } from "@/components/ui/list-row";
 import { updateCurrency } from "./actions";
 
 const CURRENCY_OPTIONS = [
@@ -34,59 +38,37 @@ export default async function SettingsPage() {
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-10">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl">
-        Cài đặt
-      </h1>
+      <PageHeader title="Cài đặt" />
 
-      <div className="flex flex-col gap-2 rounded-2xl border border-ink/10 bg-white p-4">
+      <Card className="flex flex-col gap-2">
         <p className="text-sm text-ink/60">Tiền tệ</p>
         <form action={updateCurrency} className="flex gap-2">
-          <select
+          <Select
             name="currency"
             defaultValue={profile?.currency ?? "VND"}
-            className="flex-1 rounded-xl border border-ink/15 bg-white px-3 py-2 text-sm"
+            className="text-sm"
           >
             {CURRENCY_OPTIONS.map((option) => (
               <option key={option.value} value={option.value}>
                 {option.label}
               </option>
             ))}
-          </select>
-          <button
-            type="submit"
-            className="rounded-xl bg-a px-4 py-2 text-sm text-paper"
-          >
-            Lưu
-          </button>
+          </Select>
+          <Button type="submit">Lưu</Button>
         </form>
-      </div>
+      </Card>
 
-      <Link
-        href="/together"
-        className="flex items-center justify-between rounded-2xl border border-ink/10 bg-white p-4 text-sm"
-      >
-        <span>Kết nối partner</span>
-        <span className="text-ink/60">{partnerStatusLabel}</span>
-      </Link>
+      <Card className="flex flex-col divide-y divide-ink/10 p-0">
+        <ListRow
+          href="/together"
+          label="Kết nối partner"
+          value={partnerStatusLabel}
+        />
+        <ListRow href="/settings/categories" label="Quản lý danh mục" />
+        <ListRow href="/settings/budgets" label="Ngân sách" />
+        <ListRow href="/settings/export" label="Xuất CSV chi tiêu" external />
+      </Card>
 
-      <Link
-        href="/settings/categories"
-        className="w-fit rounded-xl border border-ink/15 px-4 py-2 text-sm"
-      >
-        Quản lý danh mục
-      </Link>
-      <Link
-        href="/settings/budgets"
-        className="w-fit rounded-xl border border-ink/15 px-4 py-2 text-sm"
-      >
-        Ngân sách
-      </Link>
-      <a
-        href="/settings/export"
-        className="w-fit rounded-xl border border-ink/15 px-4 py-2 text-sm"
-      >
-        Xuất CSV chi tiêu
-      </a>
       <LogoutButton />
     </div>
   );

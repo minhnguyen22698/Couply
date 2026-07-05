@@ -5,6 +5,7 @@ import {
   type SharedExpenseItem,
 } from "@/components/together-view";
 import { FundCard, type FundContributionItem } from "@/components/fund-card";
+import { PageHeader } from "@/components/ui/page-header";
 
 function currentMonthRange() {
   const now = new Date();
@@ -40,9 +41,7 @@ export default async function TogetherPage() {
 
     return (
       <div className="flex flex-col gap-4 px-5 pt-10">
-        <h1 className="font-[family-name:var(--font-display)] text-2xl">
-          Chúng ta
-        </h1>
+        <PageHeader title="Chúng ta" />
         <CoupleConnect pendingCode={pendingCode} />
       </div>
     );
@@ -148,9 +147,7 @@ export default async function TogetherPage() {
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-10">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl">
-        Chúng ta
-      </h1>
+      <PageHeader title="Chúng ta" />
       <TogetherView
         partnerName={partnerName}
         currency={currency}

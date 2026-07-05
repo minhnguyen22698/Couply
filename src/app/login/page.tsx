@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Button } from "@/components/ui/button";
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
@@ -26,7 +27,7 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="flex flex-1 flex-col items-center justify-center gap-8 bg-paper px-6 py-16 text-ink">
+    <main className="flex flex-1 flex-col items-center justify-center gap-8 bg-paper px-6 pt-[calc(4rem+env(safe-area-inset-top,0px))] pb-[calc(4rem+env(safe-area-inset-bottom,0px))] text-ink">
       <div className="flex flex-col items-center gap-2 text-center">
         <h1 className="font-[family-name:var(--font-display)] text-4xl">
           Couply
@@ -34,16 +35,17 @@ export default function LoginPage() {
         <p className="text-ink/70">Quản lý chi tiêu cùng người ấy</p>
       </div>
 
-      <button
+      <Button
         type="button"
+        size="lg"
         onClick={handleGoogleLogin}
         disabled={isLoading}
-        className="flex w-full max-w-xs items-center justify-center gap-3 rounded-2xl bg-a px-5 py-3 font-medium text-paper transition-opacity disabled:opacity-60"
+        className="w-full max-w-xs"
       >
         {isLoading ? "Đang chuyển hướng…" : "Tiếp tục với Google"}
-      </button>
+      </Button>
 
-      {error && <p className="text-sm text-a">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
     </main>
   );
 }

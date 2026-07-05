@@ -80,18 +80,19 @@ export function RealtimeNotifications({
       <Link
         href="/notifications"
         onClick={() => setUnreadCount(0)}
-        className="fixed right-5 top-5 z-30 flex h-10 w-10 items-center justify-center rounded-full bg-white text-lg shadow"
+        aria-label="Thông báo"
+        className="fixed top-[calc(1.25rem+env(safe-area-inset-top,0px))] right-5 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-lg shadow-md"
       >
         🔔
         {unreadCount > 0 && (
-          <span className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-a px-1 text-xs text-paper">
+          <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-a px-1 text-xs text-paper">
             {unreadCount > 9 ? "9+" : unreadCount}
           </span>
         )}
       </Link>
 
       {toast && (
-        <div className="fixed inset-x-4 top-16 z-30 rounded-2xl bg-ink px-4 py-3 text-sm text-paper shadow-lg">
+        <div className="fixed inset-x-4 top-[calc(4.5rem+env(safe-area-inset-top,0px))] z-30 rounded-2xl bg-ink px-4 py-3 text-sm text-paper shadow-lg">
           {toast}
         </div>
       )}

@@ -112,11 +112,11 @@ export function PhotoCapture({
       )}
 
       {isUploading && <p className="text-xs text-ink/50">Đang tải ảnh…</p>}
-      {error && <p className="text-xs text-a">{error}</p>}
+      {error && <p className="text-xs text-danger">{error}</p>}
 
       {isZoomed && previewUrl && (
         <div
-          className="fixed inset-0 z-30 flex items-center justify-center bg-ink/80 p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/80 p-6"
           onClick={() => setIsZoomed(false)}
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}

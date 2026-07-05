@@ -13,6 +13,8 @@ import {
   useExpenseSheet,
 } from "@/components/expense-sheet-context";
 import { PhotoCapture } from "@/components/photo-capture";
+import { Button } from "@/components/ui/button";
+import { AmountInput, Input } from "@/components/ui/input";
 
 function todayIso() {
   return new Date().toISOString().slice(0, 10);
@@ -50,7 +52,7 @@ function ExpenseForm({
   return (
     <form
       action={onSubmit}
-      className="relative z-10 flex w-full max-w-md flex-col gap-4 rounded-t-3xl bg-paper p-6 pb-8"
+      className="relative z-10 flex w-full max-w-md flex-col gap-4 rounded-t-3xl bg-paper p-6 pb-[calc(2rem+env(safe-area-inset-bottom,0px))]"
     >
       <div className="mx-auto h-1 w-10 rounded-full bg-ink/15" />
 
@@ -58,14 +60,11 @@ function ExpenseForm({
         {editingExpense ? "Sửa khoản chi" : "Thêm chi tiêu"}
       </h2>
 
-      <input
+      <AmountInput
         name="amount"
-        type="text"
-        inputMode="decimal"
         placeholder="0"
         required
         defaultValue={editingExpense?.amount ?? ""}
-        className="rounded-2xl border border-ink/15 bg-white px-4 py-3 font-[family-name:var(--font-mono)] text-2xl"
       />
 
       <div className="flex gap-2 overflow-x-auto pb-1">
@@ -82,7 +81,7 @@ function ExpenseForm({
               }
               className="peer sr-only"
             />
-            <span className="flex cursor-pointer items-center gap-1 rounded-full border border-ink/15 px-3 py-1.5 text-sm peer-checked:border-a peer-checked:bg-a peer-checked:text-paper">
+            <span className="flex min-h-11 cursor-pointer items-center gap-1 rounded-full border border-ink/15 px-3 py-1.5 text-sm peer-checked:border-a peer-checked:bg-a peer-checked:text-paper">
               <span>{category.icon}</span>
               <span>{category.name}</span>
             </span>
@@ -90,19 +89,17 @@ function ExpenseForm({
         ))}
       </div>
 
-      <input
+      <Input
         name="note"
         type="text"
         placeholder="Ghi chú (tuỳ chọn)"
         defaultValue={editingExpense?.note ?? ""}
-        className="rounded-2xl border border-ink/15 bg-white px-4 py-2"
       />
 
-      <input
+      <Input
         name="spentOn"
         type="date"
         defaultValue={editingExpense?.spent_on ?? todayIso()}
-        className="rounded-2xl border border-ink/15 bg-white px-4 py-2"
       />
 
       {hasPartner && (
@@ -118,7 +115,7 @@ function ExpenseForm({
                 }
                 className="peer sr-only"
               />
-              <span className="flex cursor-pointer items-center justify-center rounded-xl border border-ink/15 px-3 py-2 text-sm peer-checked:border-a peer-checked:bg-a peer-checked:text-paper">
+              <span className="flex min-h-11 cursor-pointer items-center justify-center rounded-xl border border-ink/15 px-3 py-2 text-sm peer-checked:border-a peer-checked:bg-a peer-checked:text-paper">
                 {option.label}
               </span>
             </label>
@@ -127,7 +124,7 @@ function ExpenseForm({
       )}
 
       {hasPartner && !editingExpense && (
-        <label className="flex items-center gap-2 text-sm text-ink/70">
+        <label className="flex min-h-11 items-center gap-2 text-sm text-ink/70">
           <input
             type="checkbox"
             name="notifyPartner"
@@ -148,26 +145,23 @@ function ExpenseForm({
         />
       </div>
 
-      {error && <p className="text-sm text-a">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <div className="flex gap-3">
         {editingExpense && (
-          <button
+          <Button
             type="button"
+            variant="danger-outline"
+            size="lg"
             onClick={onDelete}
             disabled={isPending}
-            className="rounded-2xl border border-ink/15 px-5 py-3 text-sm"
           >
             Xoá
-          </button>
+          </Button>
         )}
-        <button
-          type="submit"
-          disabled={isPending}
-          className="flex-1 rounded-2xl bg-a px-5 py-3 font-medium text-paper disabled:opacity-60"
-        >
+        <Button type="submit" size="lg" disabled={isPending} className="flex-1">
           {isPending ? "Đang lưu…" : "Lưu"}
-        </button>
+        </Button>
       </div>
     </form>
   );
@@ -218,7 +212,7 @@ export function AddExpenseSheet({
   }
 
   return (
-    <div className="fixed inset-0 z-20 flex items-end justify-center bg-ink/40">
+    <div className="fixed inset-0 z-40 flex items-end justify-center bg-ink/40">
       <button
         type="button"
         aria-label="Đóng"

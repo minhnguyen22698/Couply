@@ -11,6 +11,7 @@ import {
   YAxis,
 } from "recharts";
 import { formatCurrency } from "@/lib/format";
+import { palette } from "@/lib/palette";
 
 export type ComparisonDatum = { month: string; mine: number; partner: number };
 
@@ -26,10 +27,10 @@ export function CoupleComparisonChart({
   return (
     <ResponsiveContainer width="100%" height={220}>
       <BarChart data={data} margin={{ left: 0, right: 8, top: 8, bottom: 0 }}>
-        <CartesianGrid vertical={false} stroke="#e1e0d9" />
+        <CartesianGrid vertical={false} stroke={palette.gridline} />
         <XAxis
           dataKey="month"
-          tick={{ fontSize: 12, fill: "#52514e" }}
+          tick={{ fontSize: 12, fill: palette.inkSecondary }}
           axisLine={false}
           tickLine={false}
         />
@@ -38,16 +39,16 @@ export function CoupleComparisonChart({
           formatter={(value) => formatCurrency(Number(value), currency)}
           contentStyle={{
             borderRadius: 12,
-            border: "1px solid #e1e0d9",
+            border: `1px solid ${palette.gridline}`,
             fontSize: 12,
           }}
         />
         <Legend wrapperStyle={{ fontSize: 12 }} />
-        <Bar dataKey="mine" name="Bạn" fill="#c1633b" radius={[4, 4, 0, 0]} barSize={16} />
+        <Bar dataKey="mine" name="Bạn" fill={palette.a} radius={[4, 4, 0, 0]} barSize={16} />
         <Bar
           dataKey="partner"
           name={partnerName}
-          fill="#5f8575"
+          fill={palette.b}
           radius={[4, 4, 0, 0]}
           barSize={16}
         />

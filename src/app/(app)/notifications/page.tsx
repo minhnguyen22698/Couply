@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/format";
+import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
 
 type NotificationPayload = {
   owner_name: string;
@@ -42,11 +44,9 @@ export default async function NotificationsPage() {
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-10">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl">
-        Thông báo
-      </h1>
+      <PageHeader title="Thông báo" />
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         {(notifications?.length ?? 0) > 0 ? (
           notifications!.map((n) => {
             const payload = n.payload as NotificationPayload;
@@ -71,7 +71,7 @@ export default async function NotificationsPage() {
         ) : (
           <p className="text-ink/40">Chưa có thông báo nào.</p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }

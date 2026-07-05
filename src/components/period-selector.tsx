@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { formatPeriodLabel, shiftAnchor, toIso, type Period } from "@/lib/period";
+import { IconLinkButton } from "@/components/ui/icon-button";
 
 const TABS: { value: Period; label: string }[] = [
   { value: "day", label: "Ngày" },
@@ -30,7 +31,7 @@ export function PeriodSelector({
           <Link
             key={tab.value}
             href={hrefFor(tab.value, anchor)}
-            className={`flex-1 rounded-xl border border-ink/15 px-3 py-2 text-center text-sm ${
+            className={`flex-1 rounded-xl border border-ink/15 px-3 py-2.5 text-center text-sm ${
               tab.value === period ? "border-a bg-a text-paper" : ""
             }`}
           >
@@ -39,19 +40,9 @@ export function PeriodSelector({
         ))}
       </div>
       <div className="flex items-center justify-between">
-        <Link
-          href={hrefFor(period, prev)}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-sm"
-        >
-          ←
-        </Link>
+        <IconLinkButton href={hrefFor(period, prev)}>←</IconLinkButton>
         <p className="font-medium">{formatPeriodLabel(period, anchor)}</p>
-        <Link
-          href={hrefFor(period, next)}
-          className="flex h-8 w-8 items-center justify-center rounded-full border border-ink/15 text-sm"
-        >
-          →
-        </Link>
+        <IconLinkButton href={hrefFor(period, next)}>→</IconLinkButton>
       </div>
     </div>
   );

@@ -2,6 +2,10 @@ import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/format";
 import { normalizeExpenseRow } from "@/lib/expenses";
 import { ExpenseRow } from "@/components/expense-row";
+import { Card } from "@/components/ui/card";
+import { PageHeader } from "@/components/ui/page-header";
+import { Button } from "@/components/ui/button";
+import { Input, Select } from "@/components/ui/input";
 
 export default async function ExpensesPage({
   searchParams,
@@ -48,15 +52,13 @@ export default async function ExpensesPage({
 
   return (
     <div className="flex flex-col gap-4 px-5 pt-10">
-      <h1 className="font-[family-name:var(--font-display)] text-2xl">
-        Tất cả chi tiêu
-      </h1>
+      <PageHeader title="Tất cả chi tiêu" />
 
       <form method="get" className="flex flex-wrap gap-2">
-        <select
+        <Select
           name="categoryId"
           defaultValue={categoryId ?? ""}
-          className="rounded-xl border border-ink/15 bg-white px-3 py-2 text-sm"
+          className="w-auto flex-1 text-sm"
         >
           <option value="">Tất cả danh mục</option>
           {(categories ?? []).map((category) => (
@@ -64,35 +66,30 @@ export default async function ExpensesPage({
               {category.icon} {category.name}
             </option>
           ))}
-        </select>
-        <input
+        </Select>
+        <Input
           type="date"
           name="from"
           defaultValue={from ?? ""}
-          className="rounded-xl border border-ink/15 bg-white px-3 py-2 text-sm"
+          className="w-auto text-sm"
         />
-        <input
+        <Input
           type="date"
           name="to"
           defaultValue={to ?? ""}
-          className="rounded-xl border border-ink/15 bg-white px-3 py-2 text-sm"
+          className="w-auto text-sm"
         />
-        <button
-          type="submit"
-          className="rounded-xl bg-a px-4 py-2 text-sm text-paper"
-        >
-          Lọc
-        </button>
+        <Button type="submit">Lọc</Button>
       </form>
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         <p className="text-sm text-ink/60">Tổng ({items.length} khoản)</p>
         <p className="font-[family-name:var(--font-mono)] text-2xl">
           {formatCurrency(total, currency)}
         </p>
-      </div>
+      </Card>
 
-      <div className="rounded-2xl border border-ink/10 bg-white p-5">
+      <Card>
         {items.length > 0 ? (
           items.map(({ expense, category }) => (
             <ExpenseRow
@@ -105,7 +102,7 @@ export default async function ExpensesPage({
         ) : (
           <p className="text-ink/40">Không có khoản chi nào.</p>
         )}
-      </div>
+      </Card>
     </div>
   );
 }
