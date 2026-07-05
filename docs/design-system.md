@@ -39,16 +39,46 @@ Biểu đồ Recharts không đọc được CSS custom properties trong SVG `fi
 `src/lib/palette.ts` (mirror thủ công của các token trên). Sửa màu ở
 `globals.css` thì nhớ sửa luôn `palette.ts`.
 
+**Màu categorical cho chart nhiều lát (pie/donut, ≥3 series):** dùng
+`categoricalPalette` (8 màu, thứ tự cố định) trong `palette.ts` — đây là bộ màu
+mặc định đã validate qua `dataviz` skill (`scripts/validate_palette.js`) đối
+với nền `--paper`, **không phải** `--a`/`--b`/`--gold` (những màu đó giữ vai
+trò ngữ nghĩa riêng, không dùng làm identity chung chung cho category). Luôn
+giữ đúng thứ tự mảng — đây là cơ chế an toàn cho người mù màu, xáo lại thứ tự
+là phá hỏng nó. Quá 8 danh mục thì gộp phần dư vào "Khác"
+(`foldTopCategories` trong `category-pie-chart.tsx`).
+
+**Gotcha Recharts đã gặp thật:** `<Pie label={fn}>` chỉ render label sau khi
+animation nhập cảnh xong (`showLabels: !isAnimating` trong source Recharts) —
+trong môi trường test/build tự động, animation có thể không bao giờ báo
+"xong", khiến label % không hiện dù DOM/màu vẫn đúng. Đã set
+`isAnimationActive={false}` trên `<Pie>` để label luôn hiện ngay — không chỉ
+là workaround cho việc verify, mà còn là UX tốt hơn cho 1 chart nhỏ trong báo
+cáo tài chính (không cần hiệu ứng xoay 1.9s mỗi lần xem trang).
+
 ## Typography
 
 - **Display** (`--font-fraunces`, serif): tiêu đề trang (`<PageHeader>`), số
   tiền lớn không bắt buộc — chỉ dùng cho `<h1>`/tiêu đề.
 - **Sans** (`--font-inter`): toàn bộ body text.
-- **Mono** (`--font-plex-mono`): **mọi con số tiền**, không ngoại lệ — dùng
-  qua `<AmountInput>` (nhập) hoặc class `font-[family-name:var(--font-mono)]`
-  (hiển thị).
+- **Money** (`--font-money` = Sora, gán vào token `--font-mono`): **mọi con số
+  tiền**, không ngoại lệ — dùng qua `<AmountInput>` (nhập) hoặc class
+  `font-[family-name:var(--font-mono)] tabular-nums` (hiển thị). Đổi từ IBM
+  Plex Mono sang Sora (2026-07-05) theo yêu cầu "font tiền mềm mại hơn" — Sora
+  không phải monospace thật nên **luôn kèm `tabular-nums`** để số thẳng cột
+  trong danh sách/bảng.
 - Cỡ chữ: tiêu đề trang `text-2xl`, số tiền hero `text-3xl` (mono), số tiền
   phụ `text-2xl`/`text-xl` (mono), body mặc định, chú thích `text-sm`/`text-xs`.
+
+## Nhập số tiền — format theo locale
+
+`<AmountInput currency size>` (trong `src/components/ui/input.tsx`) tự động
+format số hiển thị theo `Intl`-locale của currency (VD: VND → `vi-VN` →
+`1.500.000` dùng dấu chấm phân cách nghìn; USD → `en-US` → dấu phẩy) trong lúc
+gõ, nhưng gửi lên server một input ẩn cùng `name` chỉ chứa chuỗi số thuần —
+server action không cần biết gì về locale. **Luôn truyền `currency` prop** —
+thiếu nó sẽ mặc định VND. Có 2 size: `lg` (form thêm chi tiêu — ô to, nổi bật)
+và `sm` (form phụ như góp quỹ, đặt ngân sách/mục tiêu, đặt giá trị nhanh).
 
 ## Độ trong suốt chữ/viền (thay vì bịa xám mới)
 
@@ -80,12 +110,38 @@ Luôn ưu tiên các primitive này thay vì viết class tay lặp lại:
   size: `lg` (CTA hero — login, submit form chính), `md` (mặc định, hầu hết
   nút inline), `sm` (nút gọn trong danh sách/hàng).
 - **`<Input>` / `<Select>`** — input/select chuẩn, viền `ink/15`, bo `xl`.
-- **`<AmountInput>`** — input tiền: mono, `text-2xl`, bo `2xl`, dùng ở MỌI
-  form nhập số tiền (thêm chi tiêu, góp quỹ, đặt ngân sách/mục tiêu).
+- **`<AmountInput currency size>`** — input tiền tự format theo locale (xem
+  mục "Nhập số tiền" ở trên), dùng ở MỌI form nhập số tiền (thêm chi tiêu, góp
+  quỹ, đặt ngân sách/mục tiêu).
 - **`<IconButton>` / `<IconLinkButton href>`** — nút tròn 36px cho mũi tên
   prev/next (PeriodSelector, điều hướng tháng ở Ngân sách).
 - **`<ListRow href label value external>`** — hàng cài đặt full-width (label
   trái, giá trị + `›` phải), tối thiểu 48px cao. Dùng cho menu Cài đặt.
+
+## Icon (`lucide-react`)
+
+Bottom nav (`app-shell.tsx`) và các icon hệ thống khác (chuông thông báo) dùng
+`lucide-react` — không dùng emoji cho icon điều hướng/chức năng (emoji chỉ hợp
+cho nội dung do người dùng chọn, ví dụ icon danh mục 🍜🚗 hay ảnh hoá đơn 📷).
+Icon size chuẩn cho bottom nav: `20px`, `strokeWidth` đổi theo trạng thái active
+(`2.25` active / `1.75` inactive) để nhấn mạnh tab đang chọn mà không cần đổi
+size.
+
+## Bottom nav — nút "+" gắn liền giữa thanh
+
+FAB không còn là nút nổi rời góc phải — nó nằm giữa 4 tab (2 trái, 2 phải),
+nổi lên trên đường viền thanh nav bằng `relative -top-5` (không dùng
+`position: fixed` riêng, không cần z-index riêng vì DOM order tự vẽ đè lên
+viền). Thứ tự tab trái→phải: Tổng quan, Chúng ta, **[+]**, Báo cáo, Cài đặt.
+
+## Tab "Chúng ta" — màu theo người sở hữu
+
+Mỗi dòng chi tiêu chia sẻ có viền trái 4px + tên người + số tiền cùng màu:
+`--a` nếu là mình, `--b` nếu là partner — dùng `border-l-4 border-l-a`/
+`border-l-b` (không dùng `border-l-{color}` chung với `border-color` không
+hướng, dễ dính màu chéo sang viền dưới). Đồng bộ với màu trong thanh cân bằng
+phía trên và biểu đồ so sánh 6 tháng ở Báo cáo — 3 chỗ này phải luôn cùng quy
+ước màu.
 
 ## Z-index (từ thấp đến cao)
 

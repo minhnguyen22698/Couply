@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, IBM_Plex_Mono } from "next/font/google";
+import { Fraunces, Inter, Sora } from "next/font/google";
 import "./globals.css";
 
 const fraunces = Fraunces({
@@ -12,9 +12,12 @@ const inter = Inter({
   subsets: ["latin"],
 });
 
-const ibmPlexMono = IBM_Plex_Mono({
-  variable: "--font-plex-mono",
-  weight: ["400", "500"],
+// Money figures: softer, rounder terminals than a technical monospace like
+// IBM Plex Mono, while keeping tabular-nums (applied at each call site) for
+// column alignment in lists.
+const sora = Sora({
+  variable: "--font-money",
+  weight: ["500", "600"],
   subsets: ["latin"],
 });
 
@@ -40,7 +43,7 @@ export default function RootLayout({
   return (
     <html
       lang="vi"
-      className={`${fraunces.variable} ${inter.variable} ${ibmPlexMono.variable} h-full antialiased`}
+      className={`${fraunces.variable} ${inter.variable} ${sora.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

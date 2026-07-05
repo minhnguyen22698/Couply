@@ -53,7 +53,7 @@ export function TogetherView({
     <div className="flex flex-col gap-4">
       <Card>
         <p className="text-sm text-ink/60">Chia sẻ tháng này</p>
-        <div className="mt-2 flex justify-between font-[family-name:var(--font-mono)] text-sm">
+        <div className="mt-2 flex justify-between font-[family-name:var(--font-mono)] tabular-nums text-sm">
           <span className="text-a">Bạn: {formatCurrency(myTotal, currency)}</span>
           <span className="text-b">
             {partnerName}: {formatCurrency(partnerTotal, currency)}
@@ -72,22 +72,28 @@ export function TogetherView({
             {items.map((item) => (
               <div
                 key={item.id}
-                className="flex items-center justify-between gap-3 border-b border-ink/10 py-3 last:border-0"
+                className={`flex items-center justify-between gap-3 border-b border-b-ink/10 border-l-4 py-3 pl-3 last:border-b-0 ${
+                  item.isMine ? "border-l-a" : "border-l-b"
+                }`}
               >
                 <div className="flex items-center gap-3">
                   <span className="text-xl">{item.categoryIcon}</span>
                   <span className="flex flex-col">
-                    <span className="text-sm">
-                      {item.categoryName} ·{" "}
-                      {item.isMine ? "Bạn" : item.ownerName}
-                    </span>
-                    <span className="text-xs text-ink/50">
+                    <span className="text-sm">{item.categoryName}</span>
+                    <span
+                      className={`text-xs ${item.isMine ? "text-a" : "text-b"}`}
+                    >
+                      {item.isMine ? "Bạn" : item.ownerName} ·{" "}
                       {VISIBILITY_LABEL[item.visibility]}
                       {item.note ? ` · ${item.note}` : ""}
                     </span>
                   </span>
                 </div>
-                <span className="font-[family-name:var(--font-mono)]">
+                <span
+                  className={`font-[family-name:var(--font-mono)] tabular-nums ${
+                    item.isMine ? "text-a" : "text-b"
+                  }`}
+                >
                   {formatCurrency(item.amount, currency)}
                 </span>
               </div>

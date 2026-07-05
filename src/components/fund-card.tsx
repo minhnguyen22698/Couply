@@ -9,7 +9,7 @@ import {
 import { formatCurrency } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AmountInput, Input } from "@/components/ui/input";
 
 export type FundContributionItem = {
   id: string;
@@ -80,7 +80,7 @@ export function FundCard({
         </button>
       </div>
 
-      <p className="font-[family-name:var(--font-mono)] text-3xl">
+      <p className="font-[family-name:var(--font-mono)] tabular-nums text-3xl">
         {formatCurrency(balance, currency)}
       </p>
 
@@ -100,13 +100,12 @@ export function FundCard({
 
       {editingGoal && (
         <form action={handleSetGoal} className="flex gap-2">
-          <Input
+          <AmountInput
             name="goalAmount"
-            type="text"
-            inputMode="decimal"
+            currency={currency}
+            size="sm"
             placeholder="Số tiền mục tiêu"
             defaultValue={goalAmount ?? ""}
-            className="text-sm"
           />
           <Button type="submit" disabled={isPending}>
             Lưu
@@ -116,13 +115,12 @@ export function FundCard({
 
       <form action={handleContribute} className="flex flex-col gap-2">
         <div className="flex gap-2">
-          <Input
+          <AmountInput
             name="amount"
-            type="text"
-            inputMode="decimal"
+            currency={currency}
+            size="sm"
             placeholder="Đóng góp..."
             required
-            className="text-sm"
           />
           <Button type="submit" disabled={isPending}>
             Góp
@@ -145,7 +143,7 @@ export function FundCard({
                 {c.isMine ? "Bạn" : c.ownerName}
                 {c.note ? ` · ${c.note}` : ""}
               </span>
-              <span className="font-[family-name:var(--font-mono)]">
+              <span className="font-[family-name:var(--font-mono)] tabular-nums">
                 {formatCurrency(c.amount, currency)}
               </span>
             </div>

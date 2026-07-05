@@ -84,7 +84,7 @@ export default async function ExpensesPage({
 
       <Card>
         <p className="text-sm text-ink/60">Tổng ({items.length} khoản)</p>
-        <p className="font-[family-name:var(--font-mono)] text-2xl">
+        <p className="font-[family-name:var(--font-mono)] tabular-nums text-2xl">
           {formatCurrency(total, currency)}
         </p>
       </Card>

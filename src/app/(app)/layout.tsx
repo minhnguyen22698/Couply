@@ -18,7 +18,7 @@ export default async function ProtectedLayout({
 
   const { data: profile } = await supabase
     .from("profiles")
-    .select("onboarded")
+    .select("onboarded, currency")
     .eq("id", user.id)
     .single();
 
@@ -54,6 +54,7 @@ export default async function ProtectedLayout({
       categories={categories ?? []}
       userId={user.id}
       hasPartner={!!activeCouple}
+      currency={profile.currency}
       unreadNotifications={unreadNotifications ?? 0}
     >
       {children}

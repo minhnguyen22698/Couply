@@ -58,7 +58,7 @@ export default async function NotificationsPage() {
                 <p className="text-sm">
                   {payload.owner_name} vừa thêm khoản{" "}
                   {VISIBILITY_LABEL[payload.visibility] ?? "chia sẻ"}{" "}
-                  <span className="font-[family-name:var(--font-mono)]">
+                  <span className="font-[family-name:var(--font-mono)] tabular-nums">
                     {formatCurrency(payload.amount, currency)}
                   </span>
                 </p>

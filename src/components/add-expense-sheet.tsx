@@ -30,6 +30,7 @@ function ExpenseForm({
   categories,
   userId,
   hasPartner,
+  currency,
   editingExpense,
   isPending,
   error,
@@ -39,6 +40,7 @@ function ExpenseForm({
   categories: ExpenseCategory[];
   userId: string;
   hasPartner: boolean;
+  currency: string;
   editingExpense: ExpenseRecord | null;
   isPending: boolean;
   error: string | null;
@@ -62,6 +64,7 @@ function ExpenseForm({
 
       <AmountInput
         name="amount"
+        currency={currency}
         placeholder="0"
         required
         defaultValue={editingExpense?.amount ?? ""}
@@ -171,10 +174,12 @@ export function AddExpenseSheet({
   categories,
   userId,
   hasPartner,
+  currency,
 }: {
   categories: ExpenseCategory[];
   userId: string;
   hasPartner: boolean;
+  currency: string;
 }) {
   const { state, close } = useExpenseSheet();
   const router = useRouter();
@@ -225,6 +230,7 @@ export function AddExpenseSheet({
         categories={categories}
         userId={userId}
         hasPartner={hasPartner}
+        currency={currency}
         editingExpense={editingExpense}
         isPending={isPending}
         error={error}

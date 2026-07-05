@@ -2,13 +2,18 @@ import { createClient } from "@/lib/supabase/server";
 import { formatCurrency } from "@/lib/format";
 import { PeriodSelector } from "@/components/period-selector";
 import { getPeriodRange, parseAnchor, parsePeriod, toIso } from "@/lib/period";
-import { CategoryBarChart, type CategoryDatum } from "@/components/category-bar-chart";
+import {
+  CategoryPieChart,
+  foldTopCategories,
+  type CategoryDatum,
+} from "@/components/category-pie-chart";
 import {
   CoupleComparisonChart,
   type ComparisonDatum,
 } from "@/components/couple-comparison-chart";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
+import { categoricalPalette } from "@/lib/palette";
 
 type CategoryTotal = {
   categoryId: string | null;
@@ -111,11 +116,9 @@ export default async function ReportsPage({
     (a, b) => b.total - a.total,
   );
   const total = breakdown.reduce((sum, c) => sum + c.total, 0);
-  const chartData: CategoryDatum[] = breakdown.map((c) => ({
-    name: c.name,
-    icon: c.icon,
-    total: c.total,
-  }));
+  const chartData: CategoryDatum[] = foldTopCategories(
+    breakdown.map((c) => ({ name: c.name, icon: c.icon, total: c.total })),
+  );
 
   // End-of-month summary, always the current calendar month.
   const thisMonthTotal = (thisMonthExpenses ?? []).reduce(
@@ -205,7 +208,7 @@ export default async function ReportsPage({
 
       <Card>
         <p className="text-sm text-ink/60">Tóm tắt tháng này</p>
-        <p className="mt-1 font-[family-name:var(--font-mono)] text-2xl">
+        <p className="mt-1 font-[family-name:var(--font-mono)] tabular-nums text-2xl">
           {formatCurrency(thisMonthTotal, currency)}
         </p>
         <p className="mt-1 text-sm text-ink/60">
@@ -227,29 +230,37 @@ export default async function ReportsPage({
 
       <Card>
         <p className="text-sm text-ink/60">Tổng chi</p>
-        <p className="font-[family-name:var(--font-mono)] text-3xl">
+        <p className="font-[family-name:var(--font-mono)] tabular-nums text-3xl">
           {formatCurrency(total, currency)}
         </p>
       </Card>
 
       <Card>
         <p className="mb-2 text-sm text-ink/60">Theo danh mục</p>
-        {breakdown.length > 0 ? (
+        {chartData.length > 0 ? (
           <>
-            <CategoryBarChart data={chartData} currency={currency} />
+            <CategoryPieChart data={chartData} currency={currency} />
             <div className="mt-4 flex flex-col gap-2">
-              {breakdown.map((c) => {
+              {chartData.map((c, index) => {
                 const percent =
                   total > 0 ? Math.round((c.total / total) * 100) : 0;
                 return (
                   <div
-                    key={c.categoryId ?? "none"}
+                    key={c.name}
                     className="flex items-center justify-between text-sm"
                   >
-                    <span>
+                    <span className="flex items-center gap-2">
+                      <span
+                        aria-hidden
+                        className="h-2.5 w-2.5 shrink-0 rounded-full"
+                        style={{
+                          backgroundColor:
+                            categoricalPalette[index % categoricalPalette.length],
+                        }}
+                      />
                       {c.icon} {c.name} · {percent}%
                     </span>
-                    <span className="font-[family-name:var(--font-mono)]">
+                    <span className="font-[family-name:var(--font-mono)] tabular-nums">
                       {formatCurrency(c.total, currency)}
                     </span>
                   </div>

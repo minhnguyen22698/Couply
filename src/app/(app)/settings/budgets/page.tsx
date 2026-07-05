@@ -4,7 +4,7 @@ import { formatCurrency } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
+import { AmountInput } from "@/components/ui/input";
 import { IconLinkButton } from "@/components/ui/icon-button";
 import { setBudget } from "./actions";
 
@@ -119,7 +119,7 @@ export default async function BudgetsPage({
                 <span>
                   {category.icon} {category.name}
                 </span>
-                <span className="font-[family-name:var(--font-mono)] text-xs text-ink/60">
+                <span className="font-[family-name:var(--font-mono)] tabular-nums text-xs text-ink/60">
                   {formatCurrency(spent, currency)}
                   {budget ? ` / ${formatCurrency(budget, currency)}` : ""}
                 </span>
@@ -145,13 +145,12 @@ export default async function BudgetsPage({
                 action={setBudget.bind(null, category.id, monthDate)}
                 className="mt-2 flex gap-2"
               >
-                <Input
+                <AmountInput
                   name="amount"
-                  type="text"
-                  inputMode="decimal"
+                  currency={currency}
+                  size="sm"
                   placeholder="Đặt ngân sách"
                   defaultValue={budget ?? ""}
-                  className="text-sm"
                 />
                 <Button type="submit" size="sm">
                   Lưu

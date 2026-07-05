@@ -45,7 +45,7 @@ export function ExpenseRow({
           )}
         </span>
       </button>
-      <span className="font-[family-name:var(--font-mono)]">
+      <span className="font-[family-name:var(--font-mono)] tabular-nums">
         {formatCurrency(expense.amount, currency)}
       </span>
       <button

@@ -145,7 +145,7 @@ export default async function DashboardPage({
 
       <Card>
         <p className="text-sm text-ink/60">Tổng chi</p>
-        <p className="font-[family-name:var(--font-mono)] text-3xl">
+        <p className="font-[family-name:var(--font-mono)] tabular-nums text-3xl">
           {formatCurrency(total, currency)}
         </p>
       </Card>

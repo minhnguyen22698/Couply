@@ -49,7 +49,7 @@ export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
         <p className="text-sm text-ink/60">
           Chia sẻ mã này với partner để ghép cặp
         </p>
-        <p className="text-center font-[family-name:var(--font-mono)] text-4xl tracking-[0.3em]">
+        <p className="text-center font-[family-name:var(--font-mono)] tabular-nums text-4xl tracking-[0.3em]">
           {pendingCode}
         </p>
         <div className="flex gap-3">
@@ -101,7 +101,7 @@ export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
           maxLength={6}
           placeholder="Nhập mã 6 số"
           required
-          className="rounded-2xl border border-ink/15 bg-white px-4 py-3 text-center font-[family-name:var(--font-mono)] text-xl tracking-[0.3em]"
+          className="rounded-2xl border border-ink/15 bg-white px-4 py-3 text-center font-[family-name:var(--font-mono)] tabular-nums text-xl tracking-[0.3em]"
         />
         <Button type="submit" variant="outline" size="lg" disabled={isPending}>
           {isPending ? "Đang ghép…" : "Ghép cặp"}

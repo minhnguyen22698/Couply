@@ -1,4 +1,4 @@
-const LOCALE_BY_CURRENCY: Record<string, string> = {
+export const LOCALE_BY_CURRENCY: Record<string, string> = {
   VND: "vi-VN",
   USD: "en-US",
 };
