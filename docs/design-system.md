@@ -72,6 +72,24 @@ người dùng có bật IME, hướng dự phòng là quay lại bản 1 (số 
 format lúc blur — an toàn tuyệt đối, chỉ đánh đổi việc không thấy dấu phân
 cách trong lúc gõ).
 
+## Bug đã gặp thật: `PhotoCapture` không mở được thư viện ảnh trên điện thoại
+
+**Triệu chứng (2026-07-11):** trên điện thoại thật, bấm ô ảnh hoá đơn chỉ mở
+thẳng camera, không có lựa chọn "Chọn từ thư viện" — desktop/dev tool không
+tái hiện được vì input `capture` bị trình duyệt desktop bỏ qua.
+
+**Nguyên nhân:** `<input type="file" accept="image/*" capture="environment">`
+— thuộc tính `capture` là chỉ định "mở camera trực tiếp", không phải gợi ý.
+Nhiều trình duyệt di động (đặc biệt Chrome/WebView Android) tôn trọng đúng
+nghĩa đó: bỏ qua hẳn bảng chọn nguồn ảnh (camera/thư viện/file), nhảy thẳng
+vào camera. iOS Safari khoan dung hơn (vẫn thường hiện đủ lựa chọn) nên bug
+này dễ lọt qua nếu chỉ test trên iPhone.
+
+**Cách sửa:** bỏ thuộc tính `capture` khỏi input — giữ lại
+`accept="image/*"` là đủ để hệ điều hành hiện bảng chọn đầy đủ (chụp ảnh mới
+HOẶC chọn từ thư viện HOẶC chọn file), không ép người dùng vào 1 nguồn cụ
+thể.
+
 ## Màu sắc (`src/app/globals.css`)
 
 | Token | Hex | Vai trò | Không dùng cho |
@@ -230,10 +248,12 @@ riêng:
    `useToast()` (`toast-provider.tsx`, mount 1 lần trong `AppShell`) —
    `notify(message, "error")` hiện pill đỏ (`bg-danger`) ở cùng vị trí toast
    thông báo cũ (`RealtimeNotifications` giờ cũng dùng toast này, không tự
-   render riêng nữa). Hành động phá hủy (xoá khoản chi, ngắt kết nối) luôn có
-   `confirm()` trước khi gọi server action — áp dụng đồng nhất ở
-   `ExpenseRow`, `AddExpenseSheet`, `TogetherView`, trước đây chỉ
-   `TogetherView` có.
+   render riêng nữa). Hành động phá hủy dùng `confirm()` trước khi gọi server
+   action ở `TogetherView` (ngắt kết nối partner — hệ quả nặng, khó undo).
+   Xoá khoản chi (`ExpenseRow`, `AddExpenseSheet`) **không** còn `confirm()`
+   (bỏ theo yêu cầu 2026-07-11 — vuốt để xoá đã đủ chủ đích, thêm popup chặn
+   mỗi lần xoá làm chậm luồng); an toàn dựa vào animation xoá đủ chậm để thấy
+   + toast báo lỗi nếu thất bại, không có "undo" riêng.
 
 ## Vuốt để xoá khoản chi (`ExpenseRow`, 2026-07-11)
 
@@ -251,11 +271,13 @@ Bỏ nút "Xoá" hiện sẵn cạnh mỗi dòng chi tiêu — thay bằng vuố
   (`mix()`, RGB tuyến tính) từ `--paper`/`--ink` sang `--danger` khi kéo từ
   0 → 50% của `SWIPE_THRESHOLD` (`COLOR_FULL_AT`) — tới nửa đường đã đỏ hẳn,
   báo trước "thả tay ở đây là xoá" trước khi thực sự chạm ngưỡng xoá.
-- Thả tay khi đã kéo đủ `SWIPE_THRESHOLD` → `confirm()` trước khi gọi
-  `deleteExpense` (không xoá ngay khi vừa chạm ngưỡng, vẫn cần xác nhận) +
-  toast lỗi nếu server action fail (kèm trả dòng về vị trí cũ, không để dòng
-  đứng đỏ mãi nếu xoá thất bại) — theo đúng quy ước "Loading & lỗi" ở trên.
-  Kéo chưa đủ ngưỡng thì luôn bật lại về 0, không có trạng thái "nửa mở".
+- Thả tay khi đã kéo đủ `SWIPE_THRESHOLD` → gọi `deleteExpense` ngay, không
+  có `confirm()` chặn giữa đường (bỏ theo yêu cầu 2026-07-11 — bản đầu có
+  hỏi xác nhận nhưng làm chậm thao tác xoá mà vuốt-đủ-xa đã đủ chủ đích rồi)
+  + toast lỗi nếu server action fail (kèm trả dòng về vị trí cũ, không để
+  dòng đứng đỏ mãi nếu xoá thất bại) — theo đúng quy ước "Loading & lỗi" ở
+  trên. Kéo chưa đủ ngưỡng thì luôn bật lại về 0, không có trạng thái
+  "nửa mở".
 - **Hiệu ứng biến mất sau khi xác nhận xoá (2026-07-11)**: thay vì đứng im
   màu đỏ chờ server rồi cả danh sách giật khi `router.refresh()` trả về,
   dòng tự chạy animation biến mất ngay khi xác nhận (`phase: "removing"`) —

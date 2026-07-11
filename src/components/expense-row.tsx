@@ -103,13 +103,11 @@ export function ExpenseRow({
     setDragging(false);
     setOffset((current) => {
       if (Math.abs(current) >= SWIPE_THRESHOLD) {
-        if (confirm("Xoá khoản chi này?")) {
-          setPhase("removing");
-          runDelete();
-          // Keep sliding the same direction it was already moving instead
-          // of stopping dead — the swipe and the delete read as one motion.
-          return prefersReducedMotion() ? current : current - EXIT_SLIDE;
-        }
+        setPhase("removing");
+        runDelete();
+        // Keep sliding the same direction it was already moving instead
+        // of stopping dead — the swipe and the delete read as one motion.
+        return prefersReducedMotion() ? current : current - EXIT_SLIDE;
       }
       return 0;
     });

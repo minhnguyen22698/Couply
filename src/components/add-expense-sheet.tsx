@@ -209,7 +209,6 @@ export function AddExpenseSheet({
 
   function handleDelete() {
     if (!editingExpense) return;
-    if (!confirm("Xoá khoản chi này?")) return;
     startTransition(async () => {
       const result = await deleteExpense(editingExpense.id);
       if (result?.error) {
