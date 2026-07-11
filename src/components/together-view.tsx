@@ -6,6 +6,7 @@ import { disconnectPartner } from "@/app/(app)/together/actions";
 import { formatCurrency } from "@/lib/format";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { useToast } from "@/components/toast-provider";
 
 export type SharedExpenseItem = {
   id: string;
@@ -37,6 +38,7 @@ export function TogetherView({
   items: SharedExpenseItem[];
 }) {
   const router = useRouter();
+  const notify = useToast();
   const [isPending, startTransition] = useTransition();
   const combined = myTotal + partnerTotal;
   const myShare = combined > 0 ? Math.round((myTotal / combined) * 100) : 50;
@@ -44,7 +46,11 @@ export function TogetherView({
   function handleDisconnect() {
     if (!confirm(`Ngắt kết nối với ${partnerName}?`)) return;
     startTransition(async () => {
-      await disconnectPartner();
+      const result = await disconnectPartner();
+      if (result?.error) {
+        notify(result.error, "error");
+        return;
+      }
       router.refresh();
     });
   }
@@ -108,7 +114,7 @@ export function TogetherView({
         type="button"
         variant="danger-outline"
         onClick={handleDisconnect}
-        disabled={isPending}
+        loading={isPending}
         className="w-fit"
       >
         Ngắt kết nối partner

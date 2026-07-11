@@ -84,9 +84,9 @@ export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
           type="button"
           size="lg"
           onClick={handleCreateInvite}
-          disabled={isPending}
+          loading={isPending}
         >
-          Tạo mã mời
+          {isPending ? "Đang tạo…" : "Tạo mã mời"}
         </Button>
       </Card>
 
@@ -103,7 +103,7 @@ export function CoupleConnect({ pendingCode }: { pendingCode: string | null }) {
           required
           className="rounded-2xl border border-ink/15 bg-white px-4 py-3 text-center font-[family-name:var(--font-mono)] tabular-nums text-xl tracking-[0.3em]"
         />
-        <Button type="submit" variant="outline" size="lg" disabled={isPending}>
+        <Button type="submit" variant="outline" size="lg" loading={isPending}>
           {isPending ? "Đang ghép…" : "Ghép cặp"}
         </Button>
       </form>

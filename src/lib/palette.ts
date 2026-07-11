@@ -4,14 +4,14 @@
  * sync — see docs/design-system.md.
  */
 export const palette = {
-  ink: "#211f1c",
-  paper: "#faf6ef",
-  a: "#c1633b",
-  b: "#5f8575",
+  ink: "#1b2422",
+  paper: "#f3faf8",
+  a: "#1868db",
+  b: "#0b7a50",
   gold: "#c9a227",
   danger: "#c0392b",
-  inkSecondary: "#52514e",
-  gridline: "#e1e0d9",
+  inkSecondary: "#4f5c59",
+  gridline: "#dbe6e2",
 } as const;
 
 /**
@@ -20,7 +20,7 @@ export const palette = {
  * their semantic roles, not general category identity, so this is the
  * dataviz skill's validated 8-hue default. Fixed order is the CVD-safety
  * mechanism — never reshuffle per-render. Validated via
- * scripts/validate_palette.js against the --paper surface (#faf6ef):
+ * scripts/validate_palette.js against the --paper surface (#f3faf8):
  * all checks pass; 4 slots warn below 3:1 contrast, mitigated by always
  * pairing slices with direct % labels + the text list (never color-alone).
  */

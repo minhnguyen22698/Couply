@@ -173,7 +173,9 @@ export async function updateExpense(
   return undefined;
 }
 
-export async function deleteExpense(expenseId: string) {
+export async function deleteExpense(
+  expenseId: string,
+): Promise<ExpenseFormState> {
   const supabase = await createClient();
   const {
     data: { user },
@@ -187,11 +189,13 @@ export async function deleteExpense(expenseId: string) {
     .eq("user_id", user.id)
     .single();
 
-  await supabase
+  const { error } = await supabase
     .from("expenses")
     .delete()
     .eq("id", expenseId)
     .eq("user_id", user.id);
+
+  if (error) return { error: "Không xoá được khoản chi, thử lại." };
 
   if (existing?.receipt_path) {
     await supabase.storage.from("receipts").remove([existing.receipt_path]);
@@ -199,4 +203,5 @@ export async function deleteExpense(expenseId: string) {
 
   revalidatePath("/dashboard");
   revalidatePath("/expenses");
+  return undefined;
 }

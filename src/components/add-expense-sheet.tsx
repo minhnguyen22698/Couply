@@ -157,12 +157,12 @@ function ExpenseForm({
             variant="danger-outline"
             size="lg"
             onClick={onDelete}
-            disabled={isPending}
+            loading={isPending}
           >
             Xoá
           </Button>
         )}
-        <Button type="submit" size="lg" disabled={isPending} className="flex-1">
+        <Button type="submit" size="lg" loading={isPending} className="flex-1">
           {isPending ? "Đang lưu…" : "Lưu"}
         </Button>
       </div>
@@ -209,8 +209,13 @@ export function AddExpenseSheet({
 
   function handleDelete() {
     if (!editingExpense) return;
+    if (!confirm("Xoá khoản chi này?")) return;
     startTransition(async () => {
-      await deleteExpense(editingExpense.id);
+      const result = await deleteExpense(editingExpense.id);
+      if (result?.error) {
+        setError(result.error);
+        return;
+      }
       close();
       router.refresh();
     });

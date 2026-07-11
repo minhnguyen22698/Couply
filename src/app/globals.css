@@ -5,12 +5,12 @@
   --foreground: var(--ink);
 
   /* Couply design tokens — see docs/design-system.md for usage rules. */
-  --a: #c1633b; /* terracotta — brand / primary action */
-  --b: #5f8575; /* sage teal — partner identity / positive */
+  --a: #1868db; /* ocean blue — brand / primary action */
+  --b: #0b7a50; /* emerald green — partner identity / positive */
   --gold: #c9a227; /* warning (approaching a limit) */
   --danger: #c0392b; /* error / over a limit — never reuse --a for this */
-  --ink: #211f1c;
-  --paper: #faf6ef;
+  --ink: #1b2422;
+  --paper: #f3faf8;
 }
 
 @theme inline {
@@ -72,5 +72,48 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .animate-page-in {
     animation: none;
+  }
+}
+
+/* Bottom-nav tap feedback (see NavPendingHint in app-shell.tsx): a tiny dot
+   that only appears if a tab switch is actually still pending past 120ms —
+   most navigations resolve from the router cache before that, so this
+   doesn't flash on every tap, only on the genuinely slow ones. */
+@keyframes nav-hint-fade-in {
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes nav-hint-pulse {
+  50% {
+    opacity: 0.4;
+  }
+}
+
+.nav-hint {
+  width: 5px;
+  height: 5px;
+  border-radius: 9999px;
+  background: currentColor;
+  opacity: 0;
+  visibility: hidden;
+}
+
+.nav-hint.is-pending {
+  visibility: visible;
+  animation-name: nav-hint-fade-in, nav-hint-pulse;
+  animation-duration: 150ms, 900ms;
+  animation-delay: 120ms, 120ms;
+  animation-timing-function: ease, ease-in-out;
+  animation-iteration-count: 1, infinite;
+  animation-fill-mode: forwards, none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .nav-hint.is-pending {
+    animation: none;
+    visibility: visible;
+    opacity: 1;
   }
 }

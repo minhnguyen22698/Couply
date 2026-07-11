@@ -7,8 +7,8 @@ export default function manifest(): MetadataRoute.Manifest {
     description: "Quản lý chi tiêu cùng người ấy",
     start_url: "/",
     display: "standalone",
-    background_color: "#faf6ef",
-    theme_color: "#c1633b",
+    background_color: "#f3faf8",
+    theme_color: "#1868db",
     icons: [
       {
         src: "/icon-192x192.png",

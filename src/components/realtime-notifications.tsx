@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { useToast } from "@/components/toast-provider";
 
 type NotificationPayload = {
   owner_name: string;
@@ -24,8 +25,8 @@ export function RealtimeNotifications({
   initialUnreadCount: number;
 }) {
   const router = useRouter();
+  const notify = useToast();
   const [unreadCount, setUnreadCount] = useState(initialUnreadCount);
-  const [toast, setToast] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
@@ -53,10 +54,9 @@ export function RealtimeNotifications({
           (payload) => {
             const data = payload.new.payload as NotificationPayload;
             setUnreadCount((count) => count + 1);
-            setToast(
+            notify(
               `🔔 ${data.owner_name} vừa thêm ${VISIBILITY_LABEL[data.visibility] ?? "khoản chi chia sẻ"}`,
             );
-            setTimeout(() => setToast(null), 4000);
             // Refetch the current page's server data so screens like "Chúng
             // ta" or Dashboard reflect the new shared expense immediately.
             router.refresh();
@@ -73,29 +73,21 @@ export function RealtimeNotifications({
       cancelled = true;
       if (channel) supabase.removeChannel(channel);
     };
-  }, [userId, router]);
+  }, [userId, router, notify]);
 
   return (
-    <>
-      <Link
-        href="/notifications"
-        onClick={() => setUnreadCount(0)}
-        aria-label="Thông báo"
-        className="fixed top-[calc(1.25rem+env(safe-area-inset-top,0px))] right-5 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-lg shadow-md"
-      >
-        🔔
-        {unreadCount > 0 && (
-          <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-a px-1 text-xs text-paper">
-            {unreadCount > 9 ? "9+" : unreadCount}
-          </span>
-        )}
-      </Link>
-
-      {toast && (
-        <div className="fixed inset-x-4 top-[calc(4.5rem+env(safe-area-inset-top,0px))] z-30 rounded-2xl bg-ink px-4 py-3 text-sm text-paper shadow-lg">
-          {toast}
-        </div>
+    <Link
+      href="/notifications"
+      onClick={() => setUnreadCount(0)}
+      aria-label="Thông báo"
+      className="fixed top-[calc(1.25rem+env(safe-area-inset-top,0px))] right-5 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-lg shadow-md"
+    >
+      🔔
+      {unreadCount > 0 && (
+        <span className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-a px-1 text-xs text-paper">
+          {unreadCount > 9 ? "9+" : unreadCount}
+        </span>
       )}
-    </>
+    </Link>
   );
 }

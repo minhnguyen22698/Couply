@@ -107,8 +107,8 @@ export function FundCard({
             placeholder="Số tiền mục tiêu"
             defaultValue={goalAmount ?? ""}
           />
-          <Button type="submit" disabled={isPending}>
-            Lưu
+          <Button type="submit" loading={isPending}>
+            {isPending ? "Đang lưu…" : "Lưu"}
           </Button>
         </form>
       )}
@@ -122,8 +122,8 @@ export function FundCard({
             placeholder="Đóng góp..."
             required
           />
-          <Button type="submit" disabled={isPending}>
-            Góp
+          <Button type="submit" loading={isPending}>
+            {isPending ? "Đang góp…" : "Góp"}
           </Button>
         </div>
         <Input name="note" type="text" placeholder="Ghi chú (tuỳ chọn)" className="text-sm" />

@@ -58,13 +58,16 @@ export async function joinInvite(
   return undefined;
 }
 
-export async function disconnectPartner() {
+export async function disconnectPartner(): Promise<CoupleActionState> {
   const supabase = await createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) redirect("/login");
 
-  await supabase.rpc("leave_couple");
+  const { error } = await supabase.rpc("leave_couple");
+  if (error) return { error: friendlyError(error.message) };
+
   revalidatePath("/together");
+  return undefined;
 }

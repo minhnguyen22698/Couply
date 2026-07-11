@@ -76,12 +76,19 @@ cách trong lúc gõ).
 
 | Token | Hex | Vai trò | Không dùng cho |
 |---|---|---|---|
-| `--ink` | `#211f1c` | Chữ chính, viền, nền tối (near-black warm gray) | — |
-| `--paper` | `#faf6ef` | Nền toàn app | — |
-| `--a` (terracotta) | `#c1633b` | **Brand/hành động chính** — nút CTA, tab active, "Bạn" trong biểu đồ/so sánh 2 người | Lỗi, cảnh báo (xem `--danger`/`--gold`) |
-| `--b` (sage teal) | `#5f8575` | **Danh tính partner** — luôn gắn với "partner" trong so sánh 2 người (biểu đồ, thanh cân bằng Chúng ta) | Đừng dùng cho brand/CTA |
+| `--ink` | `#1b2422` | Chữ chính, viền, nền tối (near-black cool gray) | — |
+| `--paper` | `#f3faf8` | Nền toàn app | — |
+| `--a` (ocean blue) | `#1868db` | **Brand/hành động chính** — nút CTA, tab active, "Bạn" trong biểu đồ/so sánh 2 người | Lỗi, cảnh báo (xem `--danger`/`--gold`) |
+| `--b` (emerald green) | `#0b7a50` | **Danh tính partner** — luôn gắn với "partner" trong so sánh 2 người (biểu đồ, thanh cân bằng Chúng ta) | Đừng dùng cho brand/CTA |
 | `--gold` | `#c9a227` | **Cảnh báo** (ngân sách ≥80%) | Lỗi (dùng `--danger`) |
 | `--danger` | `#c0392b` | **Lỗi form, vượt ngân sách (≥100%), hành động phá hủy** (xoá, ngắt kết nối) | Đừng tái dùng `--a` cho việc này — từng là lỗi thiết kế đã sửa |
+
+> Đổi từ bảng màu đất nung/sage (terracotta/sage) sang "tươi xanh" (ocean
+> blue/emerald) theo yêu cầu 2026-07-11 — cả hai tông đều đạt ≥4.5:1 trên nền
+> `--paper` mới (kiểm tra thủ công qua công thức WCAG relative luminance), giữ
+> nguyên vai trò ngữ nghĩa `--a`=mình/`--b`=partner, chỉ đổi hex. `--gold`/
+> `--danger` giữ nguyên vì đây là màu chức năng (cảnh báo/lỗi), không thuộc
+> phạm vi đổi màu brand.
 
 Quy tắc: **màu accent (`--a`) không bao giờ đóng vai trò báo lỗi/cảnh báo.**
 Đây là lỗi UX thật đã gặp (thông báo lỗi từng dùng `text-a` giống hệt màu nút
@@ -196,6 +203,87 @@ hướng, dễ dính màu chéo sang viền dưới). Đồng bộ với màu tr
 phía trên và biểu đồ so sánh 6 tháng ở Báo cáo — 3 chỗ này phải luôn cùng quy
 ước màu.
 
+## Loading & lỗi cho hành động cần chờ (2026-07-11)
+
+Phản hồi: các nút ở bottom nav và nút hành động (xoá, ngắt kết nối, đăng
+xuất...) mỗi nơi loading khác nhau, có nơi bấm xong không thấy gì và lỗi thì
+im lặng — sửa bằng 2 cơ chế dùng chung, không để mỗi component tự bịa kiểu
+riêng:
+
+1. **Chuyển tab bottom nav**: mỗi route trong `(app)` (trừ layout gốc đã có
+   `(app)/loading.tsx`) có `loading.tsx` riêng (`dashboard/`, `together/`,
+   `reports/`, `settings/`) — cùng kiểu skeleton `animate-pulse bg-ink/10`.
+   Next.js prefetch xuống tới boundary này nên chuyển tab luôn thấy skeleton
+   ngay, không còn tab nào "đứng hình" chờ dữ liệu trong im lặng chỉ vì
+   30s router cache (`staleTimes.dynamic`) đã hết hạn. Thêm phụ: mỗi
+   `<NavLink>` có 1 `NavPendingHint` (dùng `useLinkStatus` từ `next/link`,
+   `app-shell.tsx`) — 1 dấu chấm nhỏ trên icon chỉ hiện nếu điều hướng còn
+   pending sau 120ms (`.nav-hint` trong `globals.css`), tránh nhấp nháy khi
+   chuyển tab đã nhanh.
+2. **Hành động async (form/button)**: dùng `<Button loading>` (mới thêm ở
+   `ui/button.tsx`) thay cho tự `disabled={isPending}` rời rạc — tự động
+   disable + hiện spinner, đồng bộ hình ảnh "đang xử lý" ở mọi nút (Lưu,
+   Góp, Ghép cặp, Ngắt kết nối, Đăng xuất...). Lỗi validation form (sai định
+   dạng, mã mời sai...) vẫn hiện `text-danger` ngay dưới nút liên quan (giữ
+   nguyên quy tắc cũ). Lỗi của hành động KHÔNG phải form (xoá, ngắt kết nối,
+   đăng xuất — không có ô lỗi tự nhiên để hiện) dùng toast chung qua
+   `useToast()` (`toast-provider.tsx`, mount 1 lần trong `AppShell`) —
+   `notify(message, "error")` hiện pill đỏ (`bg-danger`) ở cùng vị trí toast
+   thông báo cũ (`RealtimeNotifications` giờ cũng dùng toast này, không tự
+   render riêng nữa). Hành động phá hủy (xoá khoản chi, ngắt kết nối) luôn có
+   `confirm()` trước khi gọi server action — áp dụng đồng nhất ở
+   `ExpenseRow`, `AddExpenseSheet`, `TogetherView`, trước đây chỉ
+   `TogetherView` có.
+
+## Vuốt để xoá khoản chi (`ExpenseRow`, 2026-07-11)
+
+Bỏ nút "Xoá" hiện sẵn cạnh mỗi dòng chi tiêu — thay bằng vuốt sang trái, kéo
+đủ xa (`SWIPE_THRESHOLD = 120px`) rồi thả tay là xoá luôn, không cần bước
+"lộ nút rồi chạm nút" nữa. Cách hoạt động (`expense-row.tsx`):
+
+- Kéo bằng Pointer Events (`onPointerDown/Move/Up`, không dùng thư viện) —
+  `touch-pan-y` trên container để trình duyệt vẫn tự xử lý cuộn dọc trong
+  lúc JS bắt kéo ngang, tránh xung đột với cuộn trang.
+- Có ngưỡng di chuyển (`DRAG_THRESHOLD = 6px`) để phân biệt "chạm để mở sheet
+  sửa" và "kéo để xoá" — không phân biệt được thì mọi lần vuốt cũng vô tình
+  mở sheet sửa ngay sau khi thả tay.
+- **Phản hồi màu theo tiến trình kéo**: nền + màu chữ của dòng nội suy
+  (`mix()`, RGB tuyến tính) từ `--paper`/`--ink` sang `--danger` khi kéo từ
+  0 → 50% của `SWIPE_THRESHOLD` (`COLOR_FULL_AT`) — tới nửa đường đã đỏ hẳn,
+  báo trước "thả tay ở đây là xoá" trước khi thực sự chạm ngưỡng xoá.
+- Thả tay khi đã kéo đủ `SWIPE_THRESHOLD` → `confirm()` trước khi gọi
+  `deleteExpense` (không xoá ngay khi vừa chạm ngưỡng, vẫn cần xác nhận) +
+  toast lỗi nếu server action fail (kèm trả dòng về vị trí cũ, không để dòng
+  đứng đỏ mãi nếu xoá thất bại) — theo đúng quy ước "Loading & lỗi" ở trên.
+  Kéo chưa đủ ngưỡng thì luôn bật lại về 0, không có trạng thái "nửa mở".
+- **Hiệu ứng biến mất sau khi xác nhận xoá (2026-07-11)**: thay vì đứng im
+  màu đỏ chờ server rồi cả danh sách giật khi `router.refresh()` trả về,
+  dòng tự chạy animation biến mất ngay khi xác nhận (`phase: "removing"`) —
+  cảm giác xoá tức thì, không phụ thuộc độ trễ mạng. 2 chuyển động chạy song
+  song cùng lúc:
+  1. Dòng tiếp tục trượt hết ra ngoài theo đúng hướng đang kéo (`offset -
+     EXIT_SLIDE`) thay vì dừng khựng lại ở điểm thả tay.
+  2. Wrapper ngoài (chỗ có `border-b`/`last:border-0`) co chiều cao bằng kỹ
+     thuật CSS Grid `grid-template-rows: 1fr → 0fr` + fade — không cần đo
+     chiều cao bằng JS (`scrollHeight`) như cách cũ, browser tự nội suy.
+     `motion-reduce:transition-none` tắt hẳn animation này khi hệ thống bật
+     giảm chuyển động; hướng trượt ngang cũng bỏ qua nếu
+     `prefers-reduced-motion: reduce` (chỉ còn co+fade, không trượt thêm).
+  - Xoá thất bại (server action trả lỗi) → `phase` về `"idle"`, `offset` về
+    0 — dòng "hiện lại" đúng vị trí cũ kèm toast lỗi, không mất dữ liệu
+    khỏi UI trong khi thực ra chưa xoá được.
+- Đường thoát không cần gesture: chạm dòng (không vuốt) vẫn mở sheet sửa như
+  cũ, và sheet sửa có nút "Xoá" riêng — người dùng không vuốt được vẫn xoá
+  được qua đường đó.
+- **Giọt nước ở phần nền lộ ra phía sau**: neo cố định bên phải (không di
+  chuyển theo tay kéo — chỉ hiện dần ra khi dòng trượt qua), hình giọt nước
+  bằng CSS thuần (`border-radius: 50% 50% 50% 0` + `rotate(-45deg)`, không
+  cần SVG/thư viện blob), icon `Trash2` (lucide) đặt đè lên, không xoay theo
+  để luôn thẳng đứng. Scale + opacity nội suy theo cùng `progress` với màu
+  nền của dòng — giọt "lớn dần" và dòng "đỏ dần" hoàn tất cùng lúc ở 50% của
+  `SWIPE_THRESHOLD`, đọc như một hiệu ứng liên tục chứ không phải 2 hiệu ứng
+  rời rạc.
+
 ## Z-index (từ thấp đến cao)
 
 | Lớp | z-index | Ghi chú |
@@ -215,6 +303,6 @@ phía trên và biểu đồ so sánh 6 tháng ở Báo cáo — 3 chỗ này ph
 ## Trạng thái còn placeholder (chưa phải quyết định cuối)
 
 - Icon app (`public/icon-*.png`, `apple-touch-icon.png`): hình vuông đặc màu
-  terracotta — **thay bằng icon thiết kế thật khi có**.
+  `--a` (ocean blue) — **thay bằng icon thiết kế thật khi có**.
 - Web Push, polish thị giác sâu hơn (ảnh minh hoạ, illustration...): để
   Giai đoạn sau MVP theo quyết định 2026-07-05.
